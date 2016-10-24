@@ -1,5 +1,30 @@
 /* Surely you will remove the processor conditionals and this comment
    appropriately depending on whether or not you use C++. */
+
+
+/**
+The code below is the short hand version of what's actually happening between all the functions. The functions just make it easier to calculate the numbers needed to be passed to the buffer and where you want them displayed on the screen.
+
+uint16_t* terminal_buffer;
+
+void terminal_initialize(void)
+{
+  terminal_buffer = (uint16_t*) 0xB8000;
+
+  terminal_buffer[0] = (uint16_t) 2920;
+  terminal_buffer[1] = (uint16_t) 2921;
+}
+
+ #if defined(__cplusplus)
+ extern "C"
+ #endif
+
+ void kernel_main(void)
+ {
+   terminal_initialize();
+ }
+ */
+
 #if !defined(__cplusplus)
 #include <stdbool.h> /* C doesn't have booleans by default. */
 #endif
