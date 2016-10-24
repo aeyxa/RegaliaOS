@@ -16,4 +16,4 @@ aeyOS.bin: linker.ld
 	mv aeyOS.bin isodir/boot/aeyOS.bin
 
 clean:
-	rm *.o
+  rm *.o
