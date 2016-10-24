@@ -9,10 +9,10 @@ aeyOS::Terminal::Terminal()
   *
   * @terminal_buffer 0xB8000 is the memory location for writing with vga
   */
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_color = vga_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-	terminal_buffer = (uint16_t*) 0xB8000;
+  terminal_row = 0;
+  terminal_column = 0;
+  terminal_color = vga_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+  terminal_buffer = (uint16_t*) 0xB8000;
 
   for(size_t y = 0; y < VGA_HEIGHT; y++)
   {
@@ -54,13 +54,13 @@ size_t aeyOS::Terminal::strlen(const char* str)
   /**
   * Needed to know how many characters the loop in send should be.
   */
-	size_t len = 0;
+  size_t len = 0
 
-	while(str[len])
+  while(str[len])
   {
     len++;
   }
-	return len;
+  return len;
 }
 
 void aeyOS::Terminal::setcolor(uint8_t color)
