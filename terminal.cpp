@@ -1,7 +1,7 @@
 #include "common.h"
 #include "terminal.h"
 
-aeyOS::Terminal::Terminal()
+Regalia::Terminal::Terminal()
 {
   /**
   * Initializes the terminal, by setting the initial color state and the
@@ -24,14 +24,14 @@ aeyOS::Terminal::Terminal()
   }
 }
 
-aeyOS::Terminal::~Terminal()
+Regalia::Terminal::~Terminal()
 {
   /**
   * Decontructor, not current used.
   */
 };
 
-inline uint8_t aeyOS::Terminal::vga_color(enum vga_colors fg, enum vga_colors bg)
+inline uint8_t Regalia::Terminal::vga_color(enum vga_colors fg, enum vga_colors bg)
 {
   /**
   * Needed to calculate the appropiate color code for both the foreground and
@@ -40,7 +40,7 @@ inline uint8_t aeyOS::Terminal::vga_color(enum vga_colors fg, enum vga_colors bg
   return fg | bg << 4;
 }
 
-inline uint16_t aeyOS::Terminal::vga_character(unsigned char uc, uint8_t color)
+inline uint16_t Regalia::Terminal::vga_character(unsigned char uc, uint8_t color)
 {
   /**
   * This function takes into account the character passed, and adds it's value
@@ -49,7 +49,7 @@ inline uint16_t aeyOS::Terminal::vga_character(unsigned char uc, uint8_t color)
   return(uint16_t) uc | (uint16_t) color << 8;
 }
 
-size_t aeyOS::Terminal::strlen(const char* str)
+size_t Regalia::Terminal::strlen(const char* str)
 {
   /**
   * Needed to know how many characters the loop in send should be.
@@ -63,7 +63,7 @@ size_t aeyOS::Terminal::strlen(const char* str)
   return len;
 }
 
-void aeyOS::Terminal::setcolor(uint8_t color)
+void Regalia::Terminal::setcolor(uint8_t color)
 {
   /**
   * This can be used to change the color at any time, an example would be for
@@ -72,7 +72,7 @@ void aeyOS::Terminal::setcolor(uint8_t color)
   terminal_color = color;
 }
 
-void aeyOS::Terminal::display(char character, uint8_t color, size_t x, size_t y)
+void Regalia::Terminal::display(char character, uint8_t color, size_t x, size_t y)
 {
   /**
   * This is what actually displays information, by passing a uint16_t number to
@@ -84,7 +84,7 @@ void aeyOS::Terminal::display(char character, uint8_t color, size_t x, size_t y)
 	terminal_buffer[index] = vga_character(character, color);
 }
 
-void aeyOS::Terminal::position(char character)
+void Regalia::Terminal::position(char character)
 {
   /**
   * Character from send goes to display, and then we add one to the column. If
@@ -104,7 +104,7 @@ void aeyOS::Terminal::position(char character)
   }
 }
 
-void aeyOS::Terminal::send(const char* data, size_t size)
+void Regalia::Terminal::send(const char* data, size_t size)
 {
   /**
   * Loop over data equal to the number of times the size of the string passed,
@@ -116,7 +116,7 @@ void aeyOS::Terminal::send(const char* data, size_t size)
   }
 }
 
-void aeyOS::Terminal::print(const char* data)
+void Regalia::Terminal::print(const char* data)
 {
   /**
   * Send data to be displayed on the screen.

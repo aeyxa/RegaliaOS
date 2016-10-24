@@ -1,7 +1,7 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
-namespace aeyOS
+namespace Regalia
 {
   class Terminal
   {
