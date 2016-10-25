@@ -54,7 +54,7 @@ size_t Regalia::Terminal::strlen(const char* str)
   /**
   * Needed to know how many characters the loop in send should be.
   */
-  size_t len = 0
+  size_t len = 0;
 
   while(str[len])
   {
