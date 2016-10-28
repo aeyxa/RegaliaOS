@@ -17,8 +17,8 @@
 *
 * The code above prints out "hi" to the screen, using the four digit numbers in
 * which color and character are taken into account.
-*
 */
+
 Regalia::Terminal::Terminal()
 {
   /**
