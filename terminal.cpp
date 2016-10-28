@@ -1,6 +1,24 @@
 #include "common.h"
 #include "terminal.h"
 
+/**
+* The code below is the short hand version of what's actually happening between * all the functions. The functions just make it easier to calculate the numbers * needed to be passed to the buffer and where you want them displayed on the
+* screen.
+*
+* uint16_t* terminal_buffer;
+*
+* void terminal_initialize(void)
+* {
+*   terminal_buffer = (uint16_t*) 0xB8000;
+*
+*   terminal_buffer[0] = (uint16_t) 2920;
+*   terminal_buffer[1] = (uint16_t) 2921;
+* }
+*
+* The code above prints out "hi" to the screen, using the four digit numbers in
+* which color and character are taken into account.
+*
+*/
 Regalia::Terminal::Terminal()
 {
   /**
@@ -31,7 +49,8 @@ Regalia::Terminal::~Terminal()
   */
 };
 
-inline uint8_t Regalia::Terminal::vga_color(enum vga_colors fg, enum vga_colors bg)
+inline uint8_t Regalia::Terminal::vga_color(enum vga_colors fg,
+                                            enum vga_colors bg)
 {
   /**
   * Needed to calculate the appropiate color code for both the foreground and
@@ -40,7 +59,8 @@ inline uint8_t Regalia::Terminal::vga_color(enum vga_colors fg, enum vga_colors 
   return fg | bg << 4;
 }
 
-inline uint16_t Regalia::Terminal::vga_character(unsigned char uc, uint8_t color)
+inline uint16_t Regalia::Terminal::vga_character(unsigned char uc,
+                                                  uint8_t color)
 {
   /**
   * This function takes into account the character passed, and adds it's value
@@ -72,7 +92,8 @@ void Regalia::Terminal::setcolor(uint8_t color)
   terminal_color = color;
 }
 
-void Regalia::Terminal::display(char character, uint8_t color, size_t x, size_t y)
+void Regalia::Terminal::display(char character, uint8_t color,
+                                size_t x, size_t y)
 {
   /**
   * This is what actually displays information, by passing a uint16_t number to
