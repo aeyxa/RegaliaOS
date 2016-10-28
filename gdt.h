@@ -5,6 +5,14 @@
 
 namespace Regalia
 {
+  NullDescriptor();
+  CodeDescriptor();
+  DataDescriptor();
+}
+
+/*
+namespace Regalia
+{
   class GlobalDescriptorTable
   {
   public:
@@ -31,5 +39,5 @@ namespace Regalia
     SegmentDescriptor data;
   };
 }
-
+*/
 #endif

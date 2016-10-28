@@ -1,5 +1,6 @@
 #include "common.h"
 #include "terminal.h"
+#include "gdt.h"
 
 extern "C" /* Use C linkage for kernel_main. */
 
