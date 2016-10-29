@@ -1,3 +1,5 @@
+; This code comes from the http://wiki.osdev.org/Main_Page community, thanks!
+
 ; Declare constants for the multiboot header.
 MBALIGN  equ  1<<0              ; align loaded modules on page boundaries
 MEMINFO  equ  1<<1              ; provide memory map

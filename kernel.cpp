@@ -2,10 +2,14 @@
 #include "terminal.h"
 #include "gdt.h"
 
-extern "C" /* Use C linkage for kernel_main. */
+#define ever ;;
 
-void kernel_main(void)
+extern "C" void kernel_main(void)
 {
   Regalia::Terminal terminal;
   terminal.print("Regalia");
+
+  Regalia::GlobalDescriptorTable gdt;
+
+  for(ever);
 }

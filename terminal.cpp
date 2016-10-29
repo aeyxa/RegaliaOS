@@ -2,7 +2,9 @@
 #include "terminal.h"
 
 /**
-* The code below is the short hand version of what's actually happening between * all the functions. The functions just make it easier to calculate the numbers * needed to be passed to the buffer and where you want them displayed on the
+* The code below is the short hand version of what's actually happening between
+* all the functions. The functions just make it easier to calculate the numbers
+* needed to be passed to the buffer and where you want them displayed on the
 * screen.
 *
 * uint16_t* terminal_buffer;
@@ -26,6 +28,11 @@ Regalia::Terminal::Terminal()
   * position of the terminal.
   *
   * @terminal_buffer 0xB8000 is the memory location for writing with vga
+  *
+  * Information regarding this memory location can be found on Wikipedia:
+  *   https://en.wikipedia.org/wiki/VGA-compatible_text_mode
+  *
+  * ctrl+f for 0xB8000
   */
   terminal_row = 0;
   terminal_column = 0;
@@ -49,8 +56,8 @@ Regalia::Terminal::~Terminal()
   */
 };
 
-inline uint8_t Regalia::Terminal::vga_color(enum vga_colors fg,
-                                            enum vga_colors bg)
+inline uint8_t Regalia::Terminal::vga_color
+(enum vga_colors fg, enum vga_colors bg)
 {
   /**
   * Needed to calculate the appropiate color code for both the foreground and
@@ -92,8 +99,8 @@ void Regalia::Terminal::setcolor(uint8_t color)
   terminal_color = color;
 }
 
-void Regalia::Terminal::display(char character, uint8_t color,
-                                size_t x, size_t y)
+void Regalia::Terminal::display
+(char character, uint8_t color,size_t x, size_t y)
 {
   /**
   * This is what actually displays information, by passing a uint16_t number to
