@@ -24,9 +24,7 @@ null(0,0,0), hold(0,0,0), code(0,0xFFFFFFFF,0x9A), data(0,0xFFFFFFFF,0x92)
   GDT_Pointer[0] = (uint32_t)this;
   GDT_Pointer[1] = sizeof(GlobalDescriptorTable) << 16;
 
-  __asm__ __volatile__("lgdt (%0)": :"r" ((&GDT_Pointer)));
-
-  //pass_to_lgdt(GDT_Pointer[0],GDT_Pointer[1]);
+  __asm__ __volatile__("lgdt (%0)" :: "r" ((&GDT_Pointer)));
 }
 
 Regalia::GlobalDescriptorTable::~GlobalDescriptorTable()
