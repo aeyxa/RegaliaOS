@@ -1,116 +1,128 @@
-#include "common.h"
-#include "terminal.h"
-#include "gdt.h"
 #include "idt.h"
+#include "terminal.h"
 
-Regalia::InterruptDescriptorTable::GateDescriptor Regalia::InterruptDescriptorTable::idt_gate[256];
+Regalia::InterruptManager::GateDescriptor Regalia::InterruptManager::idt[256];
 
-Regalia::InterruptDescriptorTable::InterruptDescriptorTable
-(GlobalDescriptorTable* gdt)
+Regalia::InterruptManager::InterruptManager(GlobalDescriptorTable* gdt) :
+  picMasterCommand(0x20),picMasterData(0x21),
+  picSlaveCommand(0xA0),picSlaveData(0xA1)
 {
-  Regalia::InterruptDescriptorTable::KeyboardStage(gdt);
+  // This comes from gdt.cpp (which was passed from kernel.cpp)
+  uint32_t CodeSegment = gdt->CodeSegmentSelector();
 
-  InterruptDescriptorTablePointer pointer;
-
-  // The size is the gate descriptor times 256 -1 due to there being 0-255
-  // available enteries.
-  pointer.size = (256*sizeof(GateDescriptor)-1);
-
-  // This is basically the same as gdt.cpp where we assign it to 'this' except
-  // here we use a structure instead.
-  pointer.base = (uint32_t)idt_gate;
-
-  // Pass the pointer to lidt register
-  __asm__ __volatile__("lidt (%0)" :: "r" ((&pointer)));
-
-  //Regalia::InterruptDescriptorTable::KeyboardHandler();
-}
-
-Regalia::InterruptDescriptorTable::~InterruptDescriptorTable()
-{
-  /* Currently unused, this should unload the lidt. */
-}
-
-void Regalia::InterruptDescriptorTable::KeyboardStage
-(GlobalDescriptorTable* gdt)
-{
-  uint32_t keyboard_address = 0x01;
-
-  idt_gate[0x21].offset_low = (keyboard_address & 0xFFFF);
-  idt_gate[0x21].code = gdt->CodeSegmentSelector();
-  idt_gate[0x21].zero = 0;
-  idt_gate[0x21].flags = 0x8E;
-  idt_gate[0x21].offset_high = (keyboard_address & 0xFFFF) >> 16;
+  const uint8_t IDT_INTERRUPT_GATE = 0xE;
 
   /**
-  * The PICs are initialized using 8-bit command words known as Initialization
-  * Command Words (ICW)
+  * Here we set all the unspecified interrupts using InterruptIgnore().
+  *
+  * This is important because if the cpu receives an interrupt that it is not
+  * able to handle, this will produce a kernel crash.
   */
+  Regalia::Terminal terminal;
 
-  // ICW1 - Tell Pic to wait for other commands
-  Regalia::InterruptDescriptorTable::write(0x20, 0x11);
-  Regalia::InterruptDescriptorTable::write(0xA0, 0x11);
+  for(uint16_t i = 0; i < 256; i++)
+  {
+    SetInterruptDescriptorTableEntry
+    (i,CodeSegment,&IgnoreInterruptRequest,0,IDT_INTERRUPT_GATE);
+  }
+  terminal.print("END");
+  // These are the interrupt numbers for timer and keyboard interrupts.
+  const uint8_t IDT_TIMER = 0x20;
+  const uint8_t IDT_KEYBOARD = 0x21;
 
-  // ICW2 - Tell it's vector offset
-  Regalia::InterruptDescriptorTable::write(0x21 , 0x20);
-  Regalia::InterruptDescriptorTable::write(0xA1 , 0x28);
+  // Set timer interrupt
+  SetInterruptDescriptorTableEntry
+  (IDT_TIMER,CodeSegment,&HandleInterruptRequest0x00,0,IDT_INTERRUPT_GATE);
+  terminal.print("ONE");
+  // Set keyboard interrupt
+  SetInterruptDescriptorTableEntry
+  (IDT_KEYBOARD,CodeSegment,&HandleInterruptRequest0x01,0,IDT_INTERRUPT_GATE);
+  terminal.print("TWO");
+  /**
+  * Here we are specifying the interrupt numbers to not overwrite the existing
+  * interrupts that are used by the CPU already.
+  */
+  picMasterCommand.Write(0x11);
+  picSlaveCommand.Write(0x11);
 
-  // ICW3 - Tell it's master/slave (which we clear out)
-  Regalia::InterruptDescriptorTable::write(0x21 , 0x00);
-  Regalia::InterruptDescriptorTable::write(0xA1 , 0x00);
+  picMasterData.Write(0x20);
+  picSlaveData.Write(0x28);
 
-  // ICW4 - Tell it which mode we're in
-  Regalia::InterruptDescriptorTable::write(0x21 , 0x01);
-  Regalia::InterruptDescriptorTable::write(0xA1 , 0x01);
+  /**
+  * ICW3
+  *
+  * Here we tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
+  * and we tell Slave PIC its cascade identity (0000 0010).
+  */
+  picMasterData.Write(0x04);
+  picSlaveData.Write(0x02);
 
-  // Mask
-  Regalia::InterruptDescriptorTable::write(0x21 , 0xFF);
-  Regalia::InterruptDescriptorTable::write(0xA1 , 0xFF);
+  // Here we specify 8086 mode
+  picMasterData.Write(0x01);
+  picSlaveData.Write(0x01);
+
+  // Here we restore defaults
+  picMasterData.Write(0x00);
+  picSlaveData.Write(0x00);
+
+  // Create a pointer to the idt
+  InterruptDescriptorTablePointer idt_pointer;
+
+  // idt has a max of 256 entries
+  idt_pointer.size = 256 * sizeof(GateDescriptor) - 1;
+
+  // a pointer to the table
+  idt_pointer.base = (uint32_t)idt;
+
+  // Inline assembly that loads the idt using the lidt register
+  __asm__ __volatile__("lidt %0" :: "m" (idt_pointer));
 }
 
-void Regalia::InterruptDescriptorTable::Activate()
+void Regalia::InterruptManager::SetInterruptDescriptorTableEntry
+  (uint8_t interruptNumber, uint16_t codeSegmentSelectorOffset,
+  void (*handler)(), uint8_t DescriptorPrivilegeLevel, uint8_t DescriptorType)
 {
+  const uint8_t IDT_DESC_PRESENT = 0x80;
+
+  /**
+  * Here we are setting the bytes for the idt which will later be pointed at in
+  * memory below.
+  *
+  * Information regarding the structure of the idt can be found on the
+  * AMD/INTEL manuals regarding the IDT.
+  */
+  idt[interruptNumber].handlerAddressLow = ((uint32_t)handler) & 0xFFFF;
+  idt[interruptNumber].handlerAddressHigh = (((uint32_t)handler)>>16) & 0xFFFF;
+  idt[interruptNumber].gdt_codeSegmentSelector = codeSegmentSelectorOffset;
+  idt[interruptNumber].access =
+  (IDT_DESC_PRESENT | DescriptorType | ((DescriptorPrivilegeLevel&3) << 5));
+  idt[interruptNumber].zero = 0; // always set to 0 as defined in AMD manual
+}
+
+Regalia::InterruptManager::~InterruptManager()
+{
+
+}
+
+void Regalia::InterruptManager::Activate()
+{
+  // Tell the cpu to start listening for interrupts using the start interrupt
+  // register. This is in a different function because we will need to call the
+  // idt first, and then set up the hardware, lastly we will then call activate.
+
   __asm__ __volatile__("sti");
 }
-void Regalia::InterruptDescriptorTable::KeyboardEnable()
+
+/**
+* This is used to handle an interrupt that is passed;
+*
+* @param interruptNumber this number specifies the type of interrupt
+* @param esp This is the current stack pointer
+*/
+uint32_t Regalia::InterruptManager::HandleInterrupt
+  (uint8_t interruptNumber, uint32_t esp)
 {
-  Regalia::InterruptDescriptorTable::write(0x21 , 0xFD);
-}
-
-static inline void Regalia::InterruptDescriptorTable::write
-(uint16_t _port, uint8_t _data)
-{
-  __asm__ __volatile__("outb %0, %1" : : "a" (_data), "Nd" (_port));
-}
-
-static inline uint8_t Regalia::InterruptDescriptorTable::read(uint16_t _port)
-{
-  uint8_t result;
-
-  __asm__ __volatile__("inb %1, %0" : "=a" (result) : "Nd" (_port));
-
-  return result;
-}
-
-void Regalia::InterruptDescriptorTable::KeyboardHandler()
-{
-  uint8_t status, keycode;
-  char* foo = "INTERRUPT 0x00";
-  char* hex = "0123456789ABCDEF";
-
-  write(0x20,0x20);
-
-  status = read(0x64);
-
-  if(status & 0x01)
-  {
-    keycode = read(0x60);
-
-    foo[12] = hex[(keycode >> 4) & 0xF];
-    foo[13] = hex[keycode & 0xF];
-
-    Regalia::Terminal terminal;
-
-    terminal.print(foo);
-  }
+  Regalia::Terminal terminal;
+  terminal.print("INTERRUPT");
+  return esp;
 }

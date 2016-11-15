@@ -10,9 +10,15 @@ extern "C" void kernel_main(void)
   Regalia::Terminal terminal;
   terminal.print("Regalia");
 
+  // Global Descriptor Table
   Regalia::GlobalDescriptorTable gdt;
-  Regalia::InterruptDescriptorTable idt(&gdt);
+
+  // Interrupt Descriptor Table
+  Regalia::InterruptManager idt(&gdt);
+
+  // Start listening for interrupts
   idt.Activate();
-  idt.KeyboardEnable();
+
+  // Loop forever
   for(ever);
 }

@@ -1,5 +1,5 @@
 
-Regalia.iso: boot.o kernel.o terminal.o gdt.o idt.o Regalia.bin
+Regalia.iso: boot.o kernel.o terminal.o port.o gdt.o idt.o idt_asm.o Regalia.bin
 	grub2-mkrescue -o Regalia.iso loader
 
 boot.o: boot.asm
@@ -17,8 +17,14 @@ gdt.o: gdt.cpp gdt.h
 idt.o: idt.cpp idt.h
 	i686-elf-g++ -c idt.cpp -o idt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
+idt_asm.o: idt.asm
+	nasm -felf32 idt.asm -o idt_asm.o
+
+port.o: port.cpp port.h
+	i686-elf-g++ -c port.cpp -o port.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
+
 Regalia.bin: linker.ld
-	i686-elf-g++ -T linker.ld -o Regalia.bin -ffreestanding -O2 -nostdlib boot.o kernel.o terminal.o gdt.o idt.o -fno-exceptions -fno-rtti -lgcc
+	i686-elf-g++ -T linker.ld -o Regalia.bin -ffreestanding -O2 -nostdlib port.o boot.o kernel.o terminal.o gdt.o idt.o idt_asm.o -fno-exceptions -fno-rtti -lgcc
 	mv Regalia.bin loader/boot/Regalia.bin
 
 clean:
