@@ -14,10 +14,10 @@ extern "C" void kernel_main(void)
   Regalia::GlobalDescriptorTable gdt;
 
   // Interrupt Descriptor Table
-  Regalia::InterruptManager idt(&gdt);
+  idt_install();
 
   // Start listening for interrupts
-  idt.Activate();
+  //idt.Activate();
 
   // Loop forever
   for(ever);

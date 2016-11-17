@@ -8,19 +8,19 @@ boot.o: boot.asm
 kernel.o: kernel.cpp common.h
 	i686-elf-g++ -c kernel.cpp -o kernel.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
-terminal.o: terminal.cpp terminal.h
+terminal.o: terminal.cpp terminal.h common.h
 	i686-elf-g++ -c terminal.cpp -o terminal.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
-gdt.o: gdt.cpp gdt.h
+gdt.o: gdt.cpp gdt.h common.h
 	i686-elf-g++ -c gdt.cpp -o gdt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
-idt.o: idt.cpp idt.h
+idt.o: idt.cpp idt.h common.h
 	i686-elf-g++ -c idt.cpp -o idt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
 idt_asm.o: idt.asm
 	nasm -felf32 idt.asm -o idt_asm.o
 
-port.o: port.cpp port.h
+port.o: port.cpp port.h common.h
 	i686-elf-g++ -c port.cpp -o port.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
 Regalia.bin: linker.ld
