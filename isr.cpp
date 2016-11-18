@@ -113,6 +113,5 @@ extern "C" void exception_handler(struct regs *r)
   {
     Regalia::Terminal terminal;
     terminal.print(exception_messages[r->int_no]);
-    for(;;);
   }
 }

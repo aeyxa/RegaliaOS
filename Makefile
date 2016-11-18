@@ -1,5 +1,5 @@
 
-Regalia.iso: boot.o kernel.o terminal.o port.o gdt.o idt.o idt_asm.o isr.o isr_asm.o Regalia.bin
+Regalia.iso: boot.o kernel.o terminal.o port.o gdt.o gdt_asm.o idt.o idt_asm.o isr.o isr_asm.o irq.o irq_asm.o keyboard.o Regalia.bin
 	grub2-mkrescue -o Regalia.iso loader
 
 boot.o: boot.asm
@@ -14,6 +14,9 @@ terminal.o: terminal.cpp terminal.h common.h
 gdt.o: gdt.cpp gdt.h common.h
 	i686-elf-g++ -c gdt.cpp -o gdt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
+gdt_asm.o: gdt.asm
+	nasm -felf32 gdt.asm -o gdt_asm.o
+
 idt.o: idt.cpp idt.h common.h
 	i686-elf-g++ -c idt.cpp -o idt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
@@ -26,11 +29,20 @@ isr.o: isr.cpp isr.h common.h
 isr_asm.o: isr.asm
 	nasm -felf32 isr.asm -o isr_asm.o
 
+irq.o: irq.cpp irq.h common.h
+	i686-elf-g++ -c irq.cpp -o irq.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
+
+irq_asm.o: irq.asm
+	nasm -felf32 irq.asm -o irq_asm.o
+
 port.o: port.cpp port.h common.h
 	i686-elf-g++ -c port.cpp -o port.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
+keyboard.o: keyboard.cpp keyboard.h common.h
+	i686-elf-g++ -c keyboard.cpp -o keyboard.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
+
 Regalia.bin: linker.ld
-	i686-elf-g++ -T linker.ld -o Regalia.bin -ffreestanding -O2 -nostdlib port.o boot.o kernel.o terminal.o gdt.o idt.o idt_asm.o isr.o isr_asm.o -fno-exceptions -fno-rtti -lgcc
+	i686-elf-g++ -T linker.ld -o Regalia.bin -ffreestanding -O2 -nostdlib port.o boot.o kernel.o terminal.o gdt.o gdt_asm.o idt.o idt_asm.o isr.o isr_asm.o irq.o irq_asm.o keyboard.o -fno-exceptions -fno-rtti -lgcc
 	mv Regalia.bin loader/boot/Regalia.bin
 
 clean:

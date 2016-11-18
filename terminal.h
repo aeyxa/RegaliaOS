@@ -1,6 +1,8 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
+#include "common.h"
+
 namespace Regalia
 {
   class Terminal

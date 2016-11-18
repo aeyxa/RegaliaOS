@@ -11,4 +11,7 @@ struct regs {
      uint32_t eip, cs, eflags, useresp, ss; /* pushed by the processor automatically */
 };
 
+uint8_t inportb (unsigned short port);
+void outportb (uint16_t port, uint8_t data);
+
 #endif
