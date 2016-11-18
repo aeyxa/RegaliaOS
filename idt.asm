@@ -6,4 +6,4 @@ extern idtp
 
 idt_load:
   lidt [idtp]
-  iret
+  ret

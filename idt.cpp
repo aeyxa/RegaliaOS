@@ -1,3 +1,4 @@
+#include "common.h"
 #include "idt.h"
 #include "terminal.h"
 
@@ -32,8 +33,8 @@ void idt_set_gate(uint8_t num, void(*handler)(), uint16_t sel, uint8_t flags)
 
 void idt_install()
 {
-  idtp.limit = ((sizeof(struct idt_entry) * 256) - 1);
-  idtp.base = &idt;
+  idtp.limit = (sizeof(struct idt_entry)*256) - 1;
+  idtp.base = (uint32_t)&idt;
 
   idt_load();
 }
