@@ -73,6 +73,7 @@ void irq_install()
 
 void irq_handler(struct regs *r)
 {
+
   void (*handler)(struct regs *r);
 
   handler = irq_routines[r->int_no];
@@ -86,5 +87,4 @@ void irq_handler(struct regs *r)
   {
       outportb(0xA0, 0x20);
   }
-  outportb(0x20, 0x20);
 }
