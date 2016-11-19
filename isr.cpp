@@ -2,6 +2,8 @@
 #include "terminal.h"
 #include "common.h"
 
+/*
+
 extern "C" void isr0();
 extern "C" void isr1();
 extern "C" void isr2();
@@ -115,3 +117,5 @@ extern "C" void exception_handler(struct regs *r)
     terminal.print(exception_messages[r->int_no]);
   }
 }
+
+*/

@@ -1,9 +1,9 @@
 section .text
 
 global gdt_flush
-extern pointer
+extern gdt
 gdt_flush:
-    lgdt [pointer]
+    lgdt [gdt]
     mov ax, 0x10
     mov ds, ax
     mov es, ax

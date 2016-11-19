@@ -1,6 +1,6 @@
 section .text
 
-extern irq_handler
+extern _ZN7Regalia24InterruptDescriptorTable24InterruptHardwareRequest7HandlerEP9Registers
 
 %macro irq 1
 
@@ -26,7 +26,7 @@ common_irq_handler:
   mov gs, ax
   mov eax, esp
   push eax
-  mov eax, irq_handler
+  mov eax, _ZN7Regalia24InterruptDescriptorTable24InterruptHardwareRequest7HandlerEP9Registers
   call eax
   pop eax
   pop gs

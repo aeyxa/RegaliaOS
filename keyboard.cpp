@@ -1,6 +1,6 @@
 #include "terminal.h"
 #include "keyboard.h"
-#include "irq.h"
+//#include "irq.h"
 #include "common.h"
 
 uint8_t kbdus[128] =
@@ -43,9 +43,10 @@ uint8_t kbdus[128] =
     0,	/* All other keys are undefined */
 };
 
-void keyboard_handler(struct regs *r)
+void keyboard_handler(struct Registers *registers)
 {
   uint8_t scancode;
+
   Regalia::Terminal terminal;
 
   scancode = inportb(0x60);
@@ -60,7 +61,7 @@ void keyboard_handler(struct regs *r)
   }
 }
 
-void keyboard_install()
+void keyboard_install(Regalia::InterruptDescriptorTable* const IDT)
 {
-  irq_install_handler((uint32_t)1, keyboard_handler);
+  //IDT.LoadHandler((uint32_t)1, keyboard_handler);
 }

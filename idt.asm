@@ -2,8 +2,8 @@ section .text
 
 global idt_load
 
-extern idtp
+extern idt
 
 idt_load:
-  lidt [idtp]
+  lidt [idt]
   ret

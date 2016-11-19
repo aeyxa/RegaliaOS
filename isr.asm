@@ -1,7 +1,7 @@
 section .text
 
 global common_handler
-extern exception_handler
+extern _ZN7Regalia24InterruptDescriptorTable24InterruptServicesRequest7HandlerEv
 
 %macro interrupt 1
 
@@ -37,7 +37,7 @@ common_handler:
   mov gs, ax
   mov eax, esp ; push us the stack
   push eax
-  mov eax, exception_handler
+  mov eax, _ZN7Regalia24InterruptDescriptorTable24InterruptServicesRequest7HandlerEv
   call eax
   pop eax
   pop gs

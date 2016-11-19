@@ -8,14 +8,10 @@
 #define GRAN 0xCF
 #define LIMIT 0xFFFFFFFF
 
-Regalia::GlobalDescriptorTable::GDT_Pointer pointer;
+Regalia::GlobalDescriptorTable::GDT_Pointer gdt;
 
 Regalia::GlobalDescriptorTable::GlobalDescriptorTable()
 {
-  this->GlobalDescriptorTableEntry(NULL,NULL,NULL,NULL,NULL);
-  this->GlobalDescriptorTableEntry(1,RING_0,LIMIT,CODE,GRAN);
-  this->GlobalDescriptorTableEntry(2,RING_0,LIMIT,DATA,GRAN);
-
   this->GlobalDescriptorTableStart();
 }
 
@@ -37,8 +33,12 @@ void Regalia::GlobalDescriptorTable::GlobalDescriptorTableEntry
 
 void Regalia::GlobalDescriptorTable::GlobalDescriptorTableStart()
 {
-  pointer.limit = (sizeof(struct GDT_Entry)*256) - 1;
-  pointer.base = &entry;
+  this->GlobalDescriptorTableEntry(NULL,NULL,NULL,NULL,NULL);
+  this->GlobalDescriptorTableEntry(1,RING_0,LIMIT,CODE,GRAN);
+  this->GlobalDescriptorTableEntry(2,RING_0,LIMIT,DATA,GRAN);
+
+  gdt.limit = (sizeof(struct GDT_Entry)*256) - 1;
+  gdt.base = (uint32_t)&entry;
 
   gdt_flush();
 }
