@@ -30,7 +30,7 @@ namespace Regalia
       InterruptHardwareRequest();
       ~InterruptHardwareRequest();
       void Configure(Regalia::InterruptDescriptorTable* const IDT);
-      void Handler(struct Registers* registers);
+      void Handler(struct Registers* registers) asm("Handler");
       void Remap();
       void LoadHandler(uint32_t irq,void(*handler)(struct Registers*registers));
       void *Routines[16] =
@@ -68,8 +68,5 @@ namespace Regalia
     ~InterruptDescriptorTable();
   };
 }
-//void irq_install_handler(uint32_t irq, void (*handler)(struct regs *r));
-//void idt_set_gate(uint8_t num, void(*handler)(), uint16_t sel, uint8_t flags);
-//void idt_install();
 
 #endif

@@ -33,7 +33,7 @@ extern "C" void kernel_main(void)
   //isr_install();
   //irq_install();
 
-  keyboard_install();
+  //keyboard_install();
 
   __asm__ __volatile__ ("sti");
 

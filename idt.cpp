@@ -160,16 +160,15 @@ extern "C" void Regalia::InterruptDescriptorTable::InterruptServicesRequest
 void Regalia::InterruptDescriptorTable::InterruptHardwareRequest
 ::Handler(struct Registers* registers)
 {
-  void (*handler)(struct Registers* registers);
-  Regalia::Terminal terminal;
-  terminal.print((char*)registers->int_no);
+  //void (*handler)(struct Registers* registers);
+  //void (*handler)();
   //this->LoadHandler((uint32_t)1, keyboard_handler);
 
-  handler = this->Routines[registers->int_no];
+  //handler = this->Routines[registers->int_no];
 
-  if(handler)
+  if(registers->int_no == 1)
   {
-    handler(registers);
+    keyboard_handler();
   }
 
   if(registers->int_no >= 8)
@@ -178,42 +177,3 @@ void Regalia::InterruptDescriptorTable::InterruptHardwareRequest
   }
   outportb(0x20, 0x20);
 }
-
-/*
-struct idt_entry
-{
-  uint16_t base_lo;
-  uint16_t sel;
-  uint8_t always0;
-  uint8_t flags;
-  uint16_t base_hi;
-}__attribute__((packed));
-
-struct idt_ptr
-{
-  uint16_t limit;
-  uint32_t base;
-}__attribute__((packed));
-
-struct idt_entry idt[256];
-struct idt_ptr idtp;
-
-extern "C" void idt_load();
-
-void CODESELECTOR,INTERRUPTGATE(uint8_t num, void(*handler)(), uint16_t sel, uint8_t flags)
-{
-  idt[num].base_lo = ((uint32_t)handler) & 0xFFFF;
-  idt[num].base_hi = ((uint32_t)handler >> 16) & 0xFFFF;
-  idt[num].sel = sel;
-  idt[num].flags = flags;
-  idt[num].always0 = 0;
-}
-
-void idt_install()
-{
-  idtp.limit = (sizeof(struct idt_entry)*256) - 1;
-  idtp.base = (uint32_t)&idt;
-
-  idt_load();
-}
-*/

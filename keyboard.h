@@ -3,7 +3,8 @@
 
 #include "idt.h"
 
-void keyboard_handler(struct Registers *registers);
-void keyboard_install(Regalia::InterruptDescriptorTable* const IDT);
+//void keyboard_handler(struct Registers *registers);
+
+void keyboard_handler();
 
 #endif
