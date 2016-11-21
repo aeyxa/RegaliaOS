@@ -33,11 +33,6 @@ namespace Regalia
       void Handler(struct Registers* registers) asm("Handler");
       void Remap();
       void LoadHandler(uint32_t irq,void(*handler)(struct Registers*registers));
-      void *Routines[16] =
-      {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0
-      };
     };
 
     void InterruptDescriptorTableEntry

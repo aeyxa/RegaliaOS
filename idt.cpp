@@ -5,7 +5,7 @@
 #include "terminal.h"
 #include "keyboard.h"
 
-// GDT segment entries are 8 bytes each, code is our second one, meaning 0x08
+// GDT segment entries are 8 bytes each, code is our second entry, meaning 0x08
 #define CODESELECTOR 0x08
 // (P=1, DPL=00b, S=0, type=1110b, type_attr=1000_1110b=0x8E)
 #define INTERRUPTGATE 0x8E
@@ -145,12 +145,6 @@ void Regalia::InterruptDescriptorTable::InterruptHardwareRequest::Remap()
   outportb(0xA1, 0x00);
 }
 
-void Regalia::InterruptDescriptorTable::InterruptHardwareRequest::LoadHandler
-(uint32_t irq, void (*handler)(struct Registers *registers))
-{
-  this->Routines[irq] = handler;
-}
-
 extern "C" void Regalia::InterruptDescriptorTable::InterruptServicesRequest
 ::Handler()
 {
@@ -160,15 +154,9 @@ extern "C" void Regalia::InterruptDescriptorTable::InterruptServicesRequest
 void Regalia::InterruptDescriptorTable::InterruptHardwareRequest
 ::Handler(struct Registers* registers)
 {
-  //void (*handler)(struct Registers* registers);
-  //void (*handler)();
-  //this->LoadHandler((uint32_t)1, keyboard_handler);
-
-  //handler = this->Routines[registers->int_no];
-
-  if(registers->int_no == 1)
+  switch(registers->int_no)
   {
-    keyboard_handler();
+    case 1: keyboard_handler(); break;
   }
 
   if(registers->int_no >= 8)

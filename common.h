@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "terminal.h"
 
 /*
 struct regs {
@@ -20,6 +21,7 @@ struct Registers {
      uint32_t eip, cs, eflags, useresp, ss;
 };
 
+Regalia::Terminal terminal;
 
 uint8_t inportb (unsigned short port);
 void outportb (uint16_t port, uint8_t data);

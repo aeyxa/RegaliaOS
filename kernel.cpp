@@ -22,18 +22,10 @@ void outportb (uint16_t port, uint8_t data)
 
 extern "C" void kernel_main(void)
 {
-  Regalia::Terminal terminal;
   terminal.print("Regalia");
 
   Regalia::GlobalDescriptorTable gdt;
   Regalia::InterruptDescriptorTable idt;
-
-  //gdt_install();
-  //idt_install();
-  //isr_install();
-  //irq_install();
-
-  //keyboard_install();
 
   __asm__ __volatile__ ("sti");
 
