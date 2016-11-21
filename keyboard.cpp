@@ -1,12 +1,13 @@
 #include "terminal.h"
 #include "keyboard.h"
 #include "common.h"
+#include "globals.h"
+#include "port.h"
 
-//void keyboard_handler(struct Registers *registers)
 void keyboard_handler()
 {
   uint8_t scancode;
-  
+
   scancode = inportb(0x60);
 
   switch(scancode)

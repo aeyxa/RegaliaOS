@@ -3,8 +3,11 @@
 
 #include "common.h"
 #include "gdt.h"
-#include "isr.h" // These are required
-#include "irq.h" // These are required
+#include "isr.h"
+#include "irq.h"
+#include "terminal.h"
+#include "keyboard.h"
+#include "port.h"
 
 extern "C"
 {

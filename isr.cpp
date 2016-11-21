@@ -113,8 +113,6 @@ extern "C" void exception_handler(struct regs *r)
 {
   if(r->int_no < 32)
   {
-    Regalia::Terminal terminal;
-    terminal.print(exception_messages[r->int_no]);
   }
 }
 

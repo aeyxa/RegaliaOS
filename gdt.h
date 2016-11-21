@@ -3,9 +3,6 @@
 
 #include "common.h"
 
-//void gdt_set_gate(uint16_t num, uint32_t base, uint16_t limit, uint8_t access,uint8_t gran);
-//void gdt_install();
-
 extern "C" void gdt_flush();
 
 namespace Regalia

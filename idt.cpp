@@ -1,9 +1,4 @@
-#include "common.h"
 #include "idt.h"
-#include "isr.h"
-#include "irq.h"
-#include "terminal.h"
-#include "keyboard.h"
 
 // GDT segment entries are 8 bytes each, code is our second entry, meaning 0x08
 #define CODESELECTOR 0x08
