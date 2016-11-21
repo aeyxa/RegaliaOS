@@ -14,9 +14,6 @@ terminal.o: terminal.cpp terminal.h common.h
 globals.o: globals.cpp globals.h common.h terminal.cpp terminal.h
 	i686-elf-g++ -c globals.cpp -o globals.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
-combined:o globals.o terminal.o
-	i686-elf-g++ -c globals.o terminal.o -o combined.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
-
 gdt.o: gdt.cpp gdt.h common.h
 	i686-elf-g++ -c gdt.cpp -o gdt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive
 
