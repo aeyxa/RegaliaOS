@@ -1,0 +1,63 @@
+OBJS:=boot.o kernel.o terminal.o globals.o port.o gdt.o gdt_asm.o idt.o idt_asm.o isr_asm.o irq_asm.o keyboard.o
+
+CC=i686-elf-g++ -c
+CFLAGS=-ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fno-use-cxa-atexit -std=c++11
+
+CRTI_OBJ=crti.o
+CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtbegin.o)
+CRTEND_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
+CRTN_OBJ=crtn.o
+
+OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(OBJS) $(CRTEND_OBJ) $(CRTN_OBJ)
+
+Regalia.iso: $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(OBJS) Regalia.bin
+	grub2-mkrescue -o Regalia.iso loader
+
+boot.o: boot.asm
+	nasm -felf32 boot.asm -o boot.o
+
+kernel.o: kernel.cpp common.h
+	i686-elf-g++ -c kernel.cpp -o kernel.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fno-use-cxa-atexit -std=c++11 -I../include/
+
+terminal.o: terminal.cpp terminal.h common.h
+	i686-elf-g++ -c terminal.cpp -o terminal.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fno-use-cxa-atexit -std=c++11 -I../include/
+
+globals.o: globals.cpp globals.h common.h terminal.cpp terminal.h
+	i686-elf-g++ -c globals.cpp -o globals.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fno-use-cxa-atexit -std=c++11 -I../include/
+
+gdt.o: gdt.cpp gdt.h common.h
+	i686-elf-g++ -c gdt.cpp -o gdt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive -fno-use-cxa-atexit -std=c++11 -I../include/
+
+gdt_asm.o: gdt.asm
+	nasm -felf32 gdt.asm -o gdt_asm.o
+
+idt.o: idt.cpp idt.h common.h
+	i686-elf-g++ -c idt.cpp -o idt.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive -fno-use-cxa-atexit -std=c++11 -I../include/
+
+idt_asm.o: idt.asm
+	nasm -felf32 idt.asm -o idt_asm.o
+
+isr_asm.o: isr.asm
+	nasm -felf32 isr.asm -o isr_asm.o
+
+irq_asm.o: irq.asm
+	nasm -felf32 irq.asm -o irq_asm.o
+
+port.o: port.cpp port.h common.h
+	i686-elf-g++ -c port.cpp -o port.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive -fno-use-cxa-atexit -std=c++11 -I../include/
+
+keyboard.o: keyboard.cpp keyboard.h common.h
+	i686-elf-g++ -c keyboard.cpp -o keyboard.o -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -fpermissive -fno-use-cxa-atexit -std=c++11 -I../include/
+
+crti.o: crti.asm
+	nasm -felf32 crti.asm -o crti.o
+
+crtn.o: crtn.asm
+	nasm -felf32 crtn.asm -o crtn.o
+
+Regalia.bin: linker.ld
+	i686-elf-g++ -T linker.ld -o Regalia.bin $(OBJ_LINK_LIST) -ffreestanding -O2 -nostdlib -fno-exceptions -fno-rtti -lgcc
+	mv Regalia.bin loader/boot/Regalia.bin
+
+clean:
+	rm *.o
