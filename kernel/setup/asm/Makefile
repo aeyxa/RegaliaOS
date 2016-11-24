@@ -10,4 +10,4 @@ irq.o: irq.asm
 	nasm -felf32 irq.asm -o $@
 
 isr.o: isr.asm
-	nasm -felf32 irq.asm -o $@
+	nasm -felf32 isr.asm -o $@

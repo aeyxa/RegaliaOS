@@ -10,7 +10,7 @@
 
 // GDT segment entries are 8 bytes each, code is our second entry, meaning 0x08
 #define CODESELECTOR 0x08
-// (P=1, DPL=00b, S=0, type=1110b, type_attr=1000_1110b=0x8E)
+// Interupt gate (P=1, DPL=00b, S=0, type=1110b, type_attr=1000_1110b=0x8E)
 #define INTERRUPTGATE 0x8E
 
 Regalia::InterruptDescriptorTable::IDT_Pointer idt;

@@ -84,7 +84,7 @@ KERNEL=$(GLOBAL) $(IO) $(KERNEL_NESTED) $(SETUP)
 ################################################################################
 # Home Directory
 ################################################################################
-OBJS=$(KERNEL) $(INCLUDE) $(BOOT)
+OBJS=$(KERNEL) $(BOOT)
 ################################################################################
 
 
@@ -93,6 +93,7 @@ CFLAGS1=-fno-exceptions -fno-rtti -fno-use-cxa-atexit
 CFLAGS2=-ffreestanding -O2 -Wall -Wextra -std=c++11
 CFLAGS=$(CFLAGS1) $(CFLAGS2)
 CC=i686-elf-g++ -c
+
 
 # This section is used for linking object files
 CC_LINKER=i686-elf-g++ -T
@@ -130,8 +131,8 @@ build: $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(OBJS) Regalia.bin
 
 # This links the object files together
 Regalia.bin: linker.ld
-	$(CC_LINKER) @$ linker.ld $(OBJ_LINK_LIST) $(FLAGS_LINKER)
+	$(CC_LINKER) linker.ld $(OBJ_LINK_LIST) $(FLAGS_LINKER) -o $@
 
 # Remove all unneeded files
 clean:
-	rm Regalia.iso Regalia.bin
+	rm -f Regalia.iso Regalia.bin
