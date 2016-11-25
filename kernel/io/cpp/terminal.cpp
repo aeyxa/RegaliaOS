@@ -31,8 +31,6 @@ Regalia::Terminal::Terminal()
   *
   * Information regarding this memory location can be found on Wikipedia:
   *   https://en.wikipedia.org/wiki/VGA-compatible_text_mode
-  *
-  * ctrl+f for 0xB8000
   */
   terminal_row = 0;
   terminal_column = 0;
@@ -107,10 +105,13 @@ void Regalia::Terminal::display
   *
   * @index is the current position of where a character will be printed.
   */
+  uint8_t newline = '\n';
+
   if(capitials)
   {
     character ^= 32;
   }
+
   const size_t index = y * VGA_WIDTH + x;
   terminal_buffer[index] = vga_character(character, color);
 }
@@ -149,7 +150,6 @@ bool Regalia::Terminal::startPosition()
       return true;
     }
   }
-
   return false;
 }
 
@@ -159,8 +159,17 @@ void Regalia::Terminal::backspace(uint8_t scancode)
   {
     if(!startPosition())
     {
-      --terminal_column;
-      display(' ', terminal_color, terminal_column, terminal_row);
+      if(terminal_column == 0)
+      {
+        --terminal_row;
+        terminal_column = 80;
+        display(' ', terminal_color, terminal_column, terminal_row);
+      }
+      else
+      {
+        --terminal_column;
+        display(' ', terminal_color, terminal_column, terminal_row);
+      }
     }
   }
 }
@@ -205,14 +214,7 @@ void Regalia::Terminal::position(char character)
   * the column is equal to the maximum, we add a new row, if the row is also at
   * it's maximum, then we reset that back to 0.
   */
-  if((uint8_t)character == (uint8_t)'\n')
-  {
-    enter(0x0E);
-  }
-  else
-  {
-    display(character, terminal_color, terminal_column, terminal_row);
-  }
+  display(character, terminal_color, terminal_column, terminal_row);
 
   if(++terminal_column == VGA_WIDTH)
   {
@@ -233,7 +235,15 @@ void Regalia::Terminal::send(const char* data, size_t size)
   */
   for (size_t i = 0; i < size; i++)
   {
-    position(data[i]);
+    if(data[i] == '\n')
+    {
+      ++terminal_row;
+      terminal_column = 0;
+    }
+    else
+    {
+      position(data[i]);
+    }
   }
 }
 

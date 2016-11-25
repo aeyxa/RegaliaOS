@@ -15,36 +15,54 @@
 #define CAPSLOCK_RELEASE 0xBA
 #define ESCAPE 0x01
 
-void keyboard_handler()
+Regalia::Keyboard::Keyboard()
 {
-  uint8_t scancode;
+  this->DisplayActivation();
+}
 
-  scancode = inportb(0x60);
+Regalia::Keyboard::~Keyboard(){}
 
-  switch(scancode)
+void Regalia::Keyboard::DisplayActivation()
+{
+  terminal << "Keyboard Interrupt Handler: Activated!\n";
+}
+
+void Regalia::Keyboard::CheckData()
+{
+  keycode = inportb(0x60);
+
+  if(keycode)
   {
-    case 0x02: terminal.keycode(scancode); break; // 1
-    case 0x03: terminal.keycode(scancode); break; // 2
-    case 0x04: terminal.keycode(scancode); break; // 3
-    case 0x05: terminal.keycode(scancode); break; // 4
-    case 0x06: terminal.keycode(scancode); break; // 5
-    case 0x07: terminal.keycode(scancode); break; // 6
-    case 0x08: terminal.keycode(scancode); break; // 7
-    case 0x09: terminal.keycode(scancode); break; // 8
-    case 0x0A: terminal.keycode(scancode); break; // 9
-    case 0x0B: terminal.keycode(scancode); break; // 0
-    case 0x0C: terminal.keycode(scancode); break; // -
-    case 0x0D: terminal.keycode(scancode); break; // =
-    case 0x27: terminal.keycode(scancode); break; // ;
-    case 0x28: terminal.keycode(scancode); break; // '
-    case 0x29: terminal.keycode(scancode); break; // `
-    case 0x2B: terminal.keycode(scancode); break; /* \ */
-    case 0x33: terminal.keycode(scancode); break; // ,
-    case 0x34: terminal.keycode(scancode); break; // .
-    case 0x35: terminal.keycode(scancode); break; /* / */
-    case 0x37: terminal.keycode(scancode); break; // *
-    case 0x1A: terminal.keycode(scancode); break; // [
-    case 0x1B: terminal.keycode(scancode); break; // ]
+    this->HandleKey(keycode);
+  }
+}
+
+void Regalia::Keyboard::HandleKey(uint8_t keycode)
+{
+  switch(keycode)
+  {
+    case 0x02: terminal.keycode(keycode); break; // 1
+    case 0x03: terminal.keycode(keycode); break; // 2
+    case 0x04: terminal.keycode(keycode); break; // 3
+    case 0x05: terminal.keycode(keycode); break; // 4
+    case 0x06: terminal.keycode(keycode); break; // 5
+    case 0x07: terminal.keycode(keycode); break; // 6
+    case 0x08: terminal.keycode(keycode); break; // 7
+    case 0x09: terminal.keycode(keycode); break; // 8
+    case 0x0A: terminal.keycode(keycode); break; // 9
+    case 0x0B: terminal.keycode(keycode); break; // 0
+    case 0x0C: terminal.keycode(keycode); break; // -
+    case 0x0D: terminal.keycode(keycode); break; // =
+    case 0x27: terminal.keycode(keycode); break; // ;
+    case 0x28: terminal.keycode(keycode); break; // '
+    case 0x29: terminal.keycode(keycode); break; // `
+    case 0x2B: terminal.keycode(keycode); break; /* \ */
+    case 0x33: terminal.keycode(keycode); break; // ,
+    case 0x34: terminal.keycode(keycode); break; // .
+    case 0x35: terminal.keycode(keycode); break; /* / */
+    case 0x37: terminal.keycode(keycode); break; // *
+    case 0x1A: terminal.keycode(keycode); break; // [
+    case 0x1B: terminal.keycode(keycode); break; // ]
 
     case 0x10: terminal.print("q"); break;
     case 0x11: terminal.print("w"); break;

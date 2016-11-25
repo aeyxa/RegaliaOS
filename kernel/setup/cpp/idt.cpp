@@ -14,6 +14,7 @@
 #define INTERRUPTGATE 0x8E
 
 Regalia::InterruptDescriptorTable::IDT_Pointer idt;
+Regalia::Keyboard keyboard;
 
 Regalia::InterruptDescriptorTable::InterruptDescriptorTable()
 {
@@ -41,6 +42,8 @@ void Regalia::InterruptDescriptorTable::InterruptDescriptorTableStart()
   idt.base = (uint32_t)&entry;
 
   idt_load();
+
+  terminal << "Interrupt Descriptor Table -> (IDT): Activated!\n";
 }
 
 // Sets up ISR
@@ -48,6 +51,8 @@ void Regalia::InterruptDescriptorTable::InterruptServicesRequestStart()
 {
   Regalia::InterruptDescriptorTable::InterruptServicesRequest isr;
   isr.Configure(this);
+
+  terminal << "Interrupt Services Request -> (ISR): Activated!\n";
 }
 
 // Sets up IRQ
@@ -55,6 +60,8 @@ void Regalia::InterruptDescriptorTable::InterruptHardwareRequestStart()
 {
   Regalia::InterruptDescriptorTable::InterruptHardwareRequest irq;
   irq.Configure(this);
+
+  terminal << "Interrupt Hardware Request -> (IRQ): Activated!\n";
 }
 
 // Empty Constructor
@@ -162,7 +169,7 @@ void Regalia::InterruptDescriptorTable::InterruptHardwareRequest::Handler
 {
   switch(registers->int_no)
   {
-    case 1: keyboard_handler(); break;
+    case 1: keyboard.CheckData(); break;
   }
 
   if(registers->int_no >= 8)

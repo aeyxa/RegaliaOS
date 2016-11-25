@@ -12,10 +12,8 @@
 
 void kernel_main(void)
 {
-  //terminal.print("Regalia");
-  terminal.print("x");
-  terminal.print('\n');
-  terminal.print("x");
+  terminal << "Regalia \n\nLoading Operating System...\n\n";
+
   Regalia::GlobalDescriptorTable gdt;
   Regalia::InterruptDescriptorTable idt;
 

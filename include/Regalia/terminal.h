@@ -44,6 +44,13 @@ namespace Regalia
     void keycode(uint8_t scancode);
     bool startPosition();
     void capitialStatus(uint8_t scancode, bool status);
+
+    template <typename T>auto operator<<(T data) -> Terminal &
+    {
+      print(data);
+      return *this;
+    }
+
   private:
     bool capitials;
 

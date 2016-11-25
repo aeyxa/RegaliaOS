@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Common/common.h>
+#include <Regalia/keyboard.h>
 
 extern "C" void idt_load();
 
