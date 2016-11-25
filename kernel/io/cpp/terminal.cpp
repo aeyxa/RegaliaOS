@@ -66,8 +66,7 @@ inline uint8_t Regalia::Terminal::vga_color
   return fg | bg << 4;
 }
 
-inline uint16_t Regalia::Terminal::vga_character(unsigned char uc,
-                                                  uint8_t color)
+inline uint16_t Regalia::Terminal::vga_character(unsigned char uc,uint8_t color)
 {
   /**
   * This function takes into account the character passed, and adds it's value
@@ -100,7 +99,7 @@ void Regalia::Terminal::setcolor(uint8_t color)
 }
 
 void Regalia::Terminal::display
-(char character, uint8_t color,size_t x, size_t y)
+(char character, uint8_t color ,uint8_t x, uint8_t y)
 {
   /**
   * This is what actually displays information, by passing a uint16_t number to
@@ -108,8 +107,95 @@ void Regalia::Terminal::display
   *
   * @index is the current position of where a character will be printed.
   */
+  if(capitials)
+  {
+    character ^= 32;
+  }
   const size_t index = y * VGA_WIDTH + x;
-	terminal_buffer[index] = vga_character(character, color);
+  terminal_buffer[index] = vga_character(character, color);
+}
+
+bool Regalia::Terminal::validateScanCode(uint8_t validate, uint8_t scancode)
+{
+  bool correctScanCode;
+
+  if(validate==scancode)
+  {
+    correctScanCode = true;
+  }
+  else correctScanCode = false;
+
+  return correctScanCode;
+}
+
+void Regalia::Terminal::enter(uint8_t scancode)
+{
+  if(validateScanCode(0x1C,scancode))
+  {
+    if(terminal_column > 0)
+    {
+      ++terminal_row;
+      terminal_column = 0;
+    }
+  }
+}
+
+bool Regalia::Terminal::startPosition()
+{
+  if(terminal_row == 0)
+  {
+    if(terminal_column == 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void Regalia::Terminal::backspace(uint8_t scancode)
+{
+  if(validateScanCode(0x0E,scancode))
+  {
+    if(!startPosition())
+    {
+      --terminal_column;
+      display(' ', terminal_color, terminal_column, terminal_row);
+    }
+  }
+}
+
+void Regalia::Terminal::tab(uint8_t scancode)
+{
+
+}
+
+void Regalia::Terminal::capitialStatus(uint8_t scancode, bool status)
+{
+  if(status)
+  {
+    if(validateScanCode(0x2A,scancode))
+    {
+      capitials = 1;
+    }
+    else if(validateScanCode(0x36,scancode))
+    {
+      capitials = 1;
+    }
+    else return;
+  }
+  else
+  {
+    if(validateScanCode(0xAA,scancode))
+    {
+      capitials = 0;
+    }
+    else if(validateScanCode(0xB6,scancode))
+    {
+      capitials = 0;
+    }
+    else return;
+  }
 }
 
 void Regalia::Terminal::position(char character)
@@ -119,7 +205,14 @@ void Regalia::Terminal::position(char character)
   * the column is equal to the maximum, we add a new row, if the row is also at
   * it's maximum, then we reset that back to 0.
   */
-  display(character, terminal_color, terminal_column, terminal_row);
+  if((uint8_t)character == (uint8_t)'\n')
+  {
+    enter(0x0E);
+  }
+  else
+  {
+    display(character, terminal_color, terminal_column, terminal_row);
+  }
 
   if(++terminal_column == VGA_WIDTH)
   {
@@ -150,4 +243,15 @@ void Regalia::Terminal::print(const char* data)
   * Send data to be displayed on the screen.
   */
   send(data, strlen(data));
+}
+
+void Regalia::Terminal::keycode(uint8_t scancode)
+{
+  switch(scancode)
+  {
+    case 0x1C: enter(scancode); break;
+    case 0x0E: backspace(scancode); break;
+    case 0x2A: case 0x36: case 0x3A: capitialStatus(scancode, (bool)1); break;
+    case 0xAA: case 0xB6: case 0xBA: capitialStatus(scancode, (bool)0); break;
+  }
 }

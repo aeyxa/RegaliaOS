@@ -12,8 +12,10 @@
 
 void kernel_main(void)
 {
-  terminal.print("Regalia");
-
+  //terminal.print("Regalia");
+  terminal.print("x");
+  terminal.print('\n');
+  terminal.print("x");
   Regalia::GlobalDescriptorTable gdt;
   Regalia::InterruptDescriptorTable idt;
 

@@ -35,7 +35,7 @@ common_handler:
   mov es, ax
   mov fs, ax
   mov gs, ax
-  mov eax, esp ; push us the stack
+  mov eax, esp
   mov ebx, esp
   push eax
   push ebx

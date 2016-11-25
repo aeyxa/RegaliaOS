@@ -37,7 +37,7 @@ KERNEL_NESTED=$(KERNEL_CPP)
 # Setup Directory
 ################################################################################
 GDT_ASM=kernel/setup/asm/gdt.o
-IDR_ASM=kernel/setup/asm/idt.o
+IDT_ASM=kernel/setup/asm/idt.o
 IRQ_ASM=kernel/setup/asm/irq.o
 ISR_ASM=kernel/setup/asm/isr.o
 
@@ -56,9 +56,9 @@ SETUP=$(SETUP_ASM) $(SETUP_CPP)
 ################################################################################
 BOOT_ASM=boot/asm/boot.o
 
-ASM=$(BOOT_ASM)
+BOOT_NESTED=$(BOOT_ASM)
 
-BOOT=$(ASM)
+BOOT=$(BOOT_NESTED)
 ################################################################################
 
 
@@ -68,9 +68,9 @@ BOOT=$(ASM)
 CRTI_ASM=init/asm/crti.o
 CRTN_ASM=init/asm/crtn.o
 
-ASM=$(CRTI_ASM) $(CRTN_ASM)
+INIT_ASM=$(CRTI_ASM) $(CRTN_ASM)
 
-INIT=$(ASM)
+INIT=$(INIT_ASM)
 ################################################################################
 
 
@@ -132,6 +132,7 @@ build: $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(OBJS) Regalia.bin
 # This links the object files together
 Regalia.bin: linker.ld
 	$(CC_LINKER) linker.ld $(OBJ_LINK_LIST) $(FLAGS_LINKER) -o $@
+	mv Regalia.bin loader/boot/Regalia.bin
 
 # Remove all unneeded files
 clean:

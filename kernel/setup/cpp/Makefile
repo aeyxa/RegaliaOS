@@ -16,7 +16,7 @@ IDT_INC=$(IDT) $(COMMON_INC)
 all: gdt.o idt.o
 
 gdt.o: gdt.cpp $(GDT_INC)
-	$(CC) gdt.cpp -o $@ $(CFLAGS)
+	$(CC) gdt.cpp $(CFLAGS) -o $@
 
 idt.o: idt.cpp $(IDT_INC)
-	$(CC) idt.cpp -o $@ $(CFLAGS)
+	$(CC) idt.cpp $(CFLAGS) -o $@

@@ -32,16 +32,26 @@ namespace Regalia
     static inline uint16_t vga_character(unsigned char uc, uint8_t color);
     size_t strlen(const char* str);
     void setcolor(uint8_t color);
-    void display(char character, uint8_t color, size_t x, size_t y);
+    void display(char character, uint8_t color, uint8_t x, uint8_t y);
     void position(char character);
+    void enter(uint8_t scancode);
+    void backspace(uint8_t scancode);
+    void tab(uint8_t scancode);
+    bool validateScanCode(uint8_t scancode, uint8_t character);
     void send(const char* data, size_t size);
     void print(const char* data);
+    void print(uint8_t data);
+    void keycode(uint8_t scancode);
+    bool startPosition();
+    void capitialStatus(uint8_t scancode, bool status);
   private:
+    bool capitials;
+
     static const size_t VGA_WIDTH = 80;
     static const size_t VGA_HEIGHT = 25;
 
-    size_t terminal_row;
-    size_t terminal_column;
+    uint8_t terminal_row;
+    uint8_t terminal_column;
     uint8_t terminal_color;
     uint16_t* terminal_buffer;
   };
