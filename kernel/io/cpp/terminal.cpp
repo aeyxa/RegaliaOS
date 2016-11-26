@@ -107,11 +107,6 @@ void Regalia::Terminal::display
   */
   uint8_t newline = '\n';
 
-  if(capitials)
-  {
-    character ^= 32;
-  }
-
   const size_t index = y * VGA_WIDTH + x;
   terminal_buffer[index] = vga_character(character, color);
 }

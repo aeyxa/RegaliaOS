@@ -1,7 +1,5 @@
 #pragma once
 
-//void keyboard_handler();
-
 namespace Regalia
 {
   class Keyboard
@@ -11,7 +9,7 @@ namespace Regalia
     ~Keyboard();
     void CheckData();
   private:
-    void Capitialization(uint8_t keycode, bool status);
+    void Capitialization(uint8_t keycode);
     void DisplayActivation();
     void HandleKey(uint8_t keycode);
     uint8_t keycode;
