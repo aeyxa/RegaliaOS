@@ -43,7 +43,6 @@ namespace Regalia
     void print(uint8_t data);
     void keycode(uint8_t scancode);
     bool startPosition();
-    void capitialStatus(uint8_t scancode, bool status);
 
     template <typename T>auto operator<<(T data) -> Terminal &
     {
@@ -52,8 +51,6 @@ namespace Regalia
     }
 
   private:
-    bool capitials;
-
     static const size_t VGA_WIDTH = 80;
     static const size_t VGA_HEIGHT = 25;
 

@@ -12,7 +12,7 @@
 
 void kernel_main(void)
 {
-  terminal << "Regalia \n\nLoading Operating System...\n\n";
+  terminal << "Regalia\n\nLoading Operating System...\n\n";
 
   Regalia::GlobalDescriptorTable gdt;
   Regalia::InterruptDescriptorTable idt;

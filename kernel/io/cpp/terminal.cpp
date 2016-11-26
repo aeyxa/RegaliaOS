@@ -174,39 +174,6 @@ void Regalia::Terminal::backspace(uint8_t scancode)
   }
 }
 
-void Regalia::Terminal::tab(uint8_t scancode)
-{
-
-}
-
-void Regalia::Terminal::capitialStatus(uint8_t scancode, bool status)
-{
-  if(status)
-  {
-    if(validateScanCode(0x2A,scancode))
-    {
-      capitials = 1;
-    }
-    else if(validateScanCode(0x36,scancode))
-    {
-      capitials = 1;
-    }
-    else return;
-  }
-  else
-  {
-    if(validateScanCode(0xAA,scancode))
-    {
-      capitials = 0;
-    }
-    else if(validateScanCode(0xB6,scancode))
-    {
-      capitials = 0;
-    }
-    else return;
-  }
-}
-
 void Regalia::Terminal::position(char character)
 {
   /**
@@ -261,7 +228,5 @@ void Regalia::Terminal::keycode(uint8_t scancode)
   {
     case 0x1C: enter(scancode); break;
     case 0x0E: backspace(scancode); break;
-    case 0x2A: case 0x36: case 0x3A: capitialStatus(scancode, (bool)1); break;
-    case 0xAA: case 0xB6: case 0xBA: capitialStatus(scancode, (bool)0); break;
   }
 }
