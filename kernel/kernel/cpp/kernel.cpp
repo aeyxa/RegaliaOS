@@ -16,7 +16,7 @@ void kernel_main(void)
 
   Regalia::GlobalDescriptorTable gdt;
   Regalia::InterruptDescriptorTable idt;
-
+  
   __asm__ __volatile__ ("sti");
 
   for(ever);

@@ -34,7 +34,7 @@ Regalia::Terminal::Terminal()
   */
   terminal_row = 0;
   terminal_column = 0;
-  terminal_color = vga_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+  terminal_color = VGAColor(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
   terminal_buffer = (uint16_t*) 0xB8000;
 
   for(size_t y = 0; y < VGA_HEIGHT; y++)
@@ -42,7 +42,7 @@ Regalia::Terminal::Terminal()
     for(size_t x = 0; x < VGA_WIDTH; x++)
     {
       const size_t index = y * VGA_WIDTH + x;
-      terminal_buffer[index] = vga_character(' ', terminal_color);
+      terminal_buffer[index] = VGACharacter(' ', terminal_color);
     }
   }
 }
@@ -54,7 +54,7 @@ Regalia::Terminal::~Terminal()
   */
 };
 
-inline uint8_t Regalia::Terminal::vga_color
+inline uint8_t Regalia::Terminal::VGAColor
 (enum vga_colors fg, enum vga_colors bg)
 {
   /**
@@ -64,7 +64,7 @@ inline uint8_t Regalia::Terminal::vga_color
   return fg | bg << 4;
 }
 
-inline uint16_t Regalia::Terminal::vga_character(unsigned char uc,uint8_t color)
+inline uint16_t Regalia::Terminal::VGACharacter(unsigned char uc,uint8_t color)
 {
   /**
   * This function takes into account the character passed, and adds it's value
@@ -73,7 +73,7 @@ inline uint16_t Regalia::Terminal::vga_character(unsigned char uc,uint8_t color)
   return(uint16_t) uc | (uint16_t) color << 8;
 }
 
-size_t Regalia::Terminal::strlen(const char* str)
+size_t Regalia::Terminal::StringLength(const char* str)
 {
   /**
   * Needed to know how many characters the loop in send should be.
@@ -87,7 +87,7 @@ size_t Regalia::Terminal::strlen(const char* str)
   return len;
 }
 
-void Regalia::Terminal::setcolor(uint8_t color)
+void Regalia::Terminal::SetColor(uint8_t color)
 {
   /**
   * This can be used to change the color at any time, an example would be for
@@ -96,7 +96,7 @@ void Regalia::Terminal::setcolor(uint8_t color)
   terminal_color = color;
 }
 
-void Regalia::Terminal::display
+void Regalia::Terminal::Display
 (char character, uint8_t color ,uint8_t x, uint8_t y)
 {
   /**
@@ -105,14 +105,15 @@ void Regalia::Terminal::display
   *
   * @index is the current position of where a character will be printed.
   */
-  uint8_t newline = '\n';
-
   const size_t index = y * VGA_WIDTH + x;
-  terminal_buffer[index] = vga_character(character, color);
+  terminal_buffer[index] = VGACharacter(character, color);
 }
 
-bool Regalia::Terminal::validateScanCode(uint8_t validate, uint8_t scancode)
+bool Regalia::Terminal::ValidateScanCode(uint8_t validate, uint8_t scancode)
 {
+  /**
+  * Compare values to validate before performing terminal logic.
+  */
   bool correctScanCode;
 
   if(validate==scancode)
@@ -124,9 +125,12 @@ bool Regalia::Terminal::validateScanCode(uint8_t validate, uint8_t scancode)
   return correctScanCode;
 }
 
-void Regalia::Terminal::enter(uint8_t scancode)
+void Regalia::Terminal::Enter(uint8_t scancode)
 {
-  if(validateScanCode(0x1C,scancode))
+  /**
+  * Add one to the row, reset cursor to position 0 on new line.
+  */
+  if(ValidateScanCode(0x1C,scancode))
   {
     if(terminal_column > 0)
     {
@@ -136,47 +140,46 @@ void Regalia::Terminal::enter(uint8_t scancode)
   }
 }
 
-bool Regalia::Terminal::startPosition()
+void Regalia::Terminal::ClearScreen()
 {
-  if(terminal_row == 0)
-  {
-    if(terminal_column == 0)
-    {
-      return true;
-    }
-  }
-  return false;
-}
+  terminal_column = 80;
+  terminal_row = 25;
 
-void Regalia::Terminal::backspace(uint8_t scancode)
-{
-  if(validateScanCode(0x0E,scancode))
+  for(uint8_t i=0; i < VGA_WIDTH+1; i++)
   {
-    if(!startPosition())
-    {
-      if(terminal_column == 0)
-      {
-        --terminal_row;
-        terminal_column = 80;
-        display(' ', terminal_color, terminal_column, terminal_row);
-      }
-      else
-      {
-        --terminal_column;
-        display(' ', terminal_color, terminal_column, terminal_row);
-      }
-    }
+    Backspace(0x0E);
   }
 }
 
-void Regalia::Terminal::position(char character)
+void Regalia::Terminal::Backspace(uint8_t scancode)
+{
+  /**
+  * If we're not at the start position
+  */
+  if(ValidateScanCode(0x0E,scancode))
+  {
+    if(terminal_column == 0 && terminal_row != 0)
+    {
+      --terminal_row;
+      terminal_column = 80;
+      Display(' ', terminal_color, terminal_column, terminal_row);
+    }
+    if(terminal_column != 0)
+    {
+      --terminal_column;
+      Display(' ', terminal_color, terminal_column, terminal_row);
+    }
+  }
+}
+
+void Regalia::Terminal::Position(char character)
 {
   /**
   * Character from send goes to display, and then we add one to the column. If
   * the column is equal to the maximum, we add a new row, if the row is also at
   * it's maximum, then we reset that back to 0.
   */
-  display(character, terminal_color, terminal_column, terminal_row);
+  Display(character, terminal_color, terminal_column, terminal_row);
 
   if(++terminal_column == VGA_WIDTH)
   {
@@ -189,7 +192,7 @@ void Regalia::Terminal::position(char character)
   }
 }
 
-void Regalia::Terminal::send(const char* data, size_t size)
+void Regalia::Terminal::Send(const char* data, size_t size)
 {
   /**
   * Loop over data equal to the number of times the size of the string passed,
@@ -204,24 +207,25 @@ void Regalia::Terminal::send(const char* data, size_t size)
     }
     else
     {
-      position(data[i]);
+      Position(data[i]);
     }
   }
 }
 
-void Regalia::Terminal::print(const char* data)
+void Regalia::Terminal::Print(const char* data)
 {
   /**
   * Send data to be displayed on the screen.
   */
-  send(data, strlen(data));
+  Send(data, StringLength(data));
 }
 
-void Regalia::Terminal::keycode(uint8_t scancode)
+void Regalia::Terminal::Keycode(uint8_t scancode)
 {
   switch(scancode)
   {
-    case 0x1C: enter(scancode); break;
-    case 0x0E: backspace(scancode); break;
+    case 0x01: ClearScreen(); break;
+    case 0x0E: Backspace(scancode); break;
+    case 0x1C: Enter(scancode); break;
   }
 }

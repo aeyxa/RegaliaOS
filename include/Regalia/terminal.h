@@ -28,25 +28,25 @@ namespace Regalia
     };
     Terminal();
     ~Terminal();
-    static inline uint8_t vga_color(enum vga_colors fg, enum vga_colors bg);
-    static inline uint16_t vga_character(unsigned char uc, uint8_t color);
-    size_t strlen(const char* str);
-    void setcolor(uint8_t color);
-    void display(char character, uint8_t color, uint8_t x, uint8_t y);
-    void position(char character);
-    void enter(uint8_t scancode);
-    void backspace(uint8_t scancode);
-    void tab(uint8_t scancode);
-    bool validateScanCode(uint8_t scancode, uint8_t character);
-    void send(const char* data, size_t size);
-    void print(const char* data);
-    void print(uint8_t data);
-    void keycode(uint8_t scancode);
-    bool startPosition();
+    static inline uint8_t VGAColor(enum vga_colors fg, enum vga_colors bg);
+    static inline uint16_t VGACharacter(unsigned char uc, uint8_t color);
+    size_t StringLength(const char* str);
+    void SetColor(uint8_t color);
+    void Display(char character, uint8_t color, uint8_t x, uint8_t y);
+    void Position(char character);
+    void Enter(uint8_t scancode);
+    void Backspace(uint8_t scancode);
+    void Tab(uint8_t scancode);
+    bool ValidateScanCode(uint8_t scancode, uint8_t character);
+    void Send(const char* data, size_t size);
+    void Print(const char* data);
+    void Print(uint8_t data);
+    void Keycode(uint8_t scancode);
+    void ClearScreen();
 
     template <typename T>auto operator<<(T data) -> Terminal &
     {
-      print(data);
+      Print(data);
       return *this;
     }
 

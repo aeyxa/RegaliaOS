@@ -50,6 +50,26 @@ void Regalia::Keyboard::Capitialization(uint8_t keycode)
 
 void Regalia::Keyboard::HandleKey(uint8_t keycode)
 {
+  switch(keycode)
+  {
+    case 0x39: terminal << " "; break;
+    case 0x0F: terminal << TAB; break;
+
+    case 0x1C: terminal.Keycode(ENTER); break;
+    case 0x0E: terminal.Keycode(BACKSPACE); break;
+
+    case 0x3A: this->Capitialization(CAPSLOCK_PRESS); break;
+
+    case 0x2A: this->Capitialization(LEFT_SHIFT_PRESS); break;
+    case 0xAA: this->Capitialization(LEFT_SHIFT_RELEASE); break;
+    case 0x36: this->Capitialization(RIGHT_SHIFT_PRESS); break;
+    case 0xB6: this->Capitialization(RIGHT_SHIFT_RELEASE); break;
+
+    case 0x01: terminal.Keycode(ESCAPE); break;
+    //case 0x38: terminal.Print("LEFT ALT"); break;
+    //case 0x1D: terminal.Print("LEFT CONTROL"); break;
+    //case 0xBA: this->Capitialization(CAPSLOCK_RELEASE); break;
+  }
   if(capitials)
   {
     switch(keycode)
@@ -162,26 +182,5 @@ void Regalia::Keyboard::HandleKey(uint8_t keycode)
       case 0x31: terminal << "n"; break;
       case 0x32: terminal << "m"; break;
     }
-  }
-
-  switch(keycode)
-  {
-    case 0x39: terminal << " "; break;
-    case 0x0F: terminal << TAB; break;
-
-    case 0x1C: terminal.keycode(ENTER); break;
-    case 0x0E: terminal.keycode(BACKSPACE); break;
-
-    case 0x3A: this->Capitialization(CAPSLOCK_PRESS); break;
-    
-    case 0x2A: this->Capitialization(LEFT_SHIFT_PRESS); break;
-    case 0xAA: this->Capitialization(LEFT_SHIFT_RELEASE); break;
-    case 0x36: this->Capitialization(RIGHT_SHIFT_PRESS); break;
-    case 0xB6: this->Capitialization(RIGHT_SHIFT_RELEASE); break;
-
-    //case 0x01: terminal.keycode(ESCAPE); break;
-    //case 0x38: terminal.print("LEFT ALT"); break;
-    //case 0x1D: terminal.print("LEFT CONTROL"); break;
-    //case 0xBA: this->Capitialization(CAPSLOCK_RELEASE); break;
   }
 }

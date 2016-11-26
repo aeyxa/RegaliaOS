@@ -160,7 +160,7 @@ void Regalia::InterruptDescriptorTable::InterruptServicesRequest::Handler
 {
   if(registers->int_no < 32)
   {
-    terminal.print(exception_messages[registers->int_no]);
+    terminal << exception_messages[registers->int_no];
   }
 }
 

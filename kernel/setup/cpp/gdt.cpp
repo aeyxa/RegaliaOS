@@ -42,6 +42,6 @@ void Regalia::GlobalDescriptorTable::GlobalDescriptorTableStart()
   gdt.base = (uint32_t)&entry;
 
   gdt_flush();
-
+  
   terminal << "Global Descriptor Table    -> (GDT): Activated!\n";
 }
