@@ -40,7 +40,7 @@ namespace Regalia
     bool ValidateScanCode(uint8_t scancode, uint8_t character);
     void Send(const char* data, size_t size);
     void Print(const char* data);
-    void Print(uint8_t data);
+    void Print(int64_t data);
     void Keycode(uint8_t scancode);
     void ClearScreen();
 

@@ -145,7 +145,7 @@ void Regalia::Terminal::ClearScreen()
   terminal_column = 80;
   terminal_row = 25;
 
-  for(uint8_t i=0; i < VGA_WIDTH+1; i++)
+  for(uint8_t i=0; i < VGA_WIDTH*VGA_HEIGHT+1; i++)
   {
     Backspace(0x0E);
   }
@@ -218,6 +218,24 @@ void Regalia::Terminal::Print(const char* data)
   * Send data to be displayed on the screen.
   */
   Send(data, StringLength(data));
+}
+
+void Regalia::Terminal::Print(int64_t data)
+{
+  // Get character for '0' then add the integer number to it, this increments
+  // the binary value of the character '0' to represent the correct integer
+  // provided as a char.
+
+  if(data < 0)
+  {
+    Position('-');
+    data = ((char)('0' + (data = -(data))));
+  }
+  else
+  {
+    data = ((char)('0' + data));
+  }
+  Position(data);
 }
 
 void Regalia::Terminal::Keycode(uint8_t scancode)

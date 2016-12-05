@@ -3,3 +3,4 @@ all:
 	+$(MAKE) -C io
 	+$(MAKE) -C kernel
 	+$(MAKE) -C setup
+	+$(MAKE) -C experimental
