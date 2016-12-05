@@ -11,3 +11,6 @@ irq.o: irq.asm
 
 isr.o: isr.asm
 	nasm -felf32 isr.asm -o $@
+
+mm.o: mm.asm
+	nasm -felf32 mm.asm -o $@

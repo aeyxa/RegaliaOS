@@ -11,6 +11,20 @@
 
 #define ever ;;
 
+char* itoa(int val, int base)
+{
+	static char buf[32] = {0};
+
+	int i = 30;
+
+	for(; val && i ; --i, val /= base)
+
+		buf[i] = "0123456789ABCDEF"[val % base];
+
+	return &buf[i+1];
+}
+
+
 void kernel_main(multiboot_info_t* mbd, unsigned int magic)
 {
   terminal << "Regalia\n\nLoading Operating System...\n\n\n";
@@ -20,7 +34,9 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic)
 
   __asm__ __volatile__ ("sti");
 
-  //mbd->mmap_addr;
+  memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
+
+  terminal << itoa(mbd->mem_upper,16);
 
   for(ever);
 }

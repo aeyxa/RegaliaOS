@@ -40,11 +40,12 @@ GDT_ASM=kernel/setup/asm/gdt.o
 IDT_ASM=kernel/setup/asm/idt.o
 IRQ_ASM=kernel/setup/asm/irq.o
 ISR_ASM=kernel/setup/asm/isr.o
+MM_ASM=kernel/setup/asm/mm.o
 
 GDT_CPP=kernel/setup/cpp/gdt.o
 IDT_CPP=kernel/setup/cpp/idt.o
 
-SETUP_ASM=$(GDT_ASM) $(IDT_ASM) $(IRQ_ASM) $(ISR_ASM)
+SETUP_ASM=$(GDT_ASM) $(IDT_ASM) $(IRQ_ASM) $(ISR_ASM) $(MM_ASM)
 SETUP_CPP=$(GDT_CPP) $(IDT_CPP)
 
 SETUP=$(SETUP_ASM) $(SETUP_CPP)
@@ -93,8 +94,6 @@ KERNEL=$(GLOBAL) $(IO) $(KERNEL_NESTED) $(SETUP) $(EXPERIMENTAL)
 ################################################################################
 OBJS=$(KERNEL) $(BOOT)
 ################################################################################
-
-
 # This section is used for compiling cpp files
 CFLAGS1=-fno-exceptions -fno-rtti -fno-use-cxa-atexit
 CFLAGS2=-ffreestanding -O2 -Wall -Wextra -std=c++11
@@ -112,8 +111,6 @@ CRTI_OBJ=$(CRTI_ASM)
 CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
 CRTN_OBJ=$(CRTN_ASM)
-
-
 ################################################################################
 # List of our objects that need to be linked together
 #
