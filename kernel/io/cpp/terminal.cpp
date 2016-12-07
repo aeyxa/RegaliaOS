@@ -238,6 +238,19 @@ void Regalia::Terminal::Print(int64_t data)
   Position(data);
 }
 
+char* Regalia::Terminal::itoa(int val, int base)
+{
+	static char buf[32] = {0};
+
+	int i = 30;
+
+	for(; val && i ; --i, val /= base)
+
+		buf[i] = "0123456789ABCDEF"[val % base];
+
+	return &buf[i+1];
+}
+
 void Regalia::Terminal::Keycode(uint8_t scancode)
 {
   switch(scancode)

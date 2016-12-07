@@ -43,6 +43,7 @@ namespace Regalia
     void Print(int64_t data);
     void Keycode(uint8_t scancode);
     void ClearScreen();
+    char* itoa(int val, int base);
 
     template <typename T>auto operator<<(T data) -> Terminal &
     {

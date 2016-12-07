@@ -10,20 +10,7 @@
 #include <Global/globals.h>
 
 #define ever ;;
-
-char* itoa(int val, int base)
-{
-	static char buf[32] = {0};
-
-	int i = 30;
-
-	for(; val && i ; --i, val /= base)
-
-		buf[i] = "0123456789ABCDEF"[val % base];
-
-	return &buf[i+1];
-}
-
+#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
 void kernel_main(multiboot_info_t* mbd, unsigned int magic)
 {
@@ -36,7 +23,12 @@ void kernel_main(multiboot_info_t* mbd, unsigned int magic)
 
   memory_map_t* mmap = (memory_map_t*) mbd->mmap_addr;
 
-  terminal << itoa(mbd->mem_upper,16);
+  if(CHECK_FLAG(mbd->flags,0))
+  {
+    terminal << terminal.itoa(mbd->mem_upper,16)
+      << " " << terminal.itoa(mbd->mem_lower,16);
+  }
+
 
   for(ever);
 }
