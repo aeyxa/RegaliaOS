@@ -43,9 +43,12 @@ namespace Regalia
 
     IDT_Entry entry[256];
 
-    void InterruptDescriptorTableStart(); // IDT
-    void InterruptServicesRequestStart(); // ISR
-    void InterruptHardwareRequestStart(); // IRQ
+    void InterruptDescriptorTableBegin(); // IDT
+    void InterruptServicesRequestBegin(); // ISR
+    void InterruptHardwareRequestBegin(); // IRQ
+
+    void InterruptDescriptorTableStart();
+
   public:
     struct IDT_Pointer
     {

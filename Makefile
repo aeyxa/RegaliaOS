@@ -40,13 +40,13 @@ GDT_ASM=kernel/setup/asm/gdt.o
 IDT_ASM=kernel/setup/asm/idt.o
 IRQ_ASM=kernel/setup/asm/irq.o
 ISR_ASM=kernel/setup/asm/isr.o
-MM_ASM=kernel/setup/asm/mm.o
 
 GDT_CPP=kernel/setup/cpp/gdt.o
 IDT_CPP=kernel/setup/cpp/idt.o
+MM_CPP=kernel/setup/cpp/memorymap.o
 
 SETUP_ASM=$(GDT_ASM) $(IDT_ASM) $(IRQ_ASM) $(ISR_ASM) $(MM_ASM)
-SETUP_CPP=$(GDT_CPP) $(IDT_CPP)
+SETUP_CPP=$(GDT_CPP) $(IDT_CPP) $(MM_CPP)
 
 SETUP=$(SETUP_ASM) $(SETUP_CPP)
 ################################################################################

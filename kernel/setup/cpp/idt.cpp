@@ -18,9 +18,11 @@ Regalia::Keyboard keyboard;
 
 Regalia::InterruptDescriptorTable::InterruptDescriptorTable()
 {
+  this->InterruptDescriptorTableBegin();
+  this->InterruptServicesRequestBegin();
+  this->InterruptHardwareRequestBegin();
+
   this->InterruptDescriptorTableStart();
-  this->InterruptServicesRequestStart();
-  this->InterruptHardwareRequestStart();
 }
 
 Regalia::InterruptDescriptorTable::~InterruptDescriptorTable(){}
@@ -36,7 +38,7 @@ void Regalia::InterruptDescriptorTable::InterruptDescriptorTableEntry
 }
 
 // Sets up IDT
-void Regalia::InterruptDescriptorTable::InterruptDescriptorTableStart()
+void Regalia::InterruptDescriptorTable::InterruptDescriptorTableBegin()
 {
   idt.limit = (sizeof(struct IDT_Entry)*256) - 1;
   idt.base = (uint32_t)&entry;
@@ -47,7 +49,7 @@ void Regalia::InterruptDescriptorTable::InterruptDescriptorTableStart()
 }
 
 // Sets up ISR
-void Regalia::InterruptDescriptorTable::InterruptServicesRequestStart()
+void Regalia::InterruptDescriptorTable::InterruptServicesRequestBegin()
 {
   Regalia::InterruptDescriptorTable::InterruptServicesRequest isr;
   isr.Configure(this);
@@ -56,12 +58,17 @@ void Regalia::InterruptDescriptorTable::InterruptServicesRequestStart()
 }
 
 // Sets up IRQ
-void Regalia::InterruptDescriptorTable::InterruptHardwareRequestStart()
+void Regalia::InterruptDescriptorTable::InterruptHardwareRequestBegin()
 {
   Regalia::InterruptDescriptorTable::InterruptHardwareRequest irq;
   irq.Configure(this);
 
   terminal << "Interrupt Hardware Request -> (IRQ): Activated!\n";
+}
+
+void Regalia::InterruptDescriptorTable::InterruptDescriptorTableStart()
+{
+  __asm__ __volatile__ ("sti");
 }
 
 // Empty Constructor

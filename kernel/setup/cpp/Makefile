@@ -9,14 +9,19 @@ REGALIA_INC=../../../include/Regalia
 
 GDT=$(REGALIA_INC)/gdt.h
 IDT=$(REGALIA_INC)/idt.h
+MM=$(REGALIA_INC)/memorymap.h
 
 GDT_INC=$(GDT) $(COMMON_INC)
 IDT_INC=$(IDT) $(COMMON_INC)
+MM_INC=$(MM) $(COMMON_INC)
 
-all: gdt.o idt.o
+all: gdt.o idt.o memorymap.o
 
 gdt.o: gdt.cpp $(GDT_INC)
 	$(CC) gdt.cpp $(CFLAGS) -o $@
 
 idt.o: idt.cpp $(IDT_INC)
 	$(CC) idt.cpp $(CFLAGS) -o $@
+
+memorymap.o: memorymap.cpp $(MM_INC)
+	$(CC) memorymap.cpp $(CFLAGS) -o $@
