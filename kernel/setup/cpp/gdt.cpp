@@ -8,6 +8,7 @@
 #define DATA 0x92
 #define GRAN 0xCF
 #define LIMIT 0xFFFFFFFF
+#define ZERO 0
 
 Regalia::GlobalDescriptorTable::GDT_Pointer gdt;
 
@@ -34,7 +35,7 @@ void Regalia::GlobalDescriptorTable::GlobalDescriptorTableEntry
 
 void Regalia::GlobalDescriptorTable::GlobalDescriptorTableStart()
 {
-  this->GlobalDescriptorTableEntry(NULL,NULL,NULL,NULL,NULL);
+  this->GlobalDescriptorTableEntry(ZERO,ZERO,ZERO,ZERO,ZERO);
   this->GlobalDescriptorTableEntry(1,RING_0,LIMIT,CODE,GRAN);
   this->GlobalDescriptorTableEntry(2,RING_0,LIMIT,DATA,GRAN);
 

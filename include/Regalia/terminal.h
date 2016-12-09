@@ -32,18 +32,9 @@ namespace Regalia
     static inline uint16_t VGACharacter(unsigned char uc, uint8_t color);
     size_t StringLength(const char* str);
     void SetColor(uint8_t color);
-    void Display(char character, uint8_t color, uint8_t x, uint8_t y);
-    void Position(char character);
-    void Enter(uint8_t scancode);
-    void Backspace(uint8_t scancode);
-    void Tab(uint8_t scancode);
-    bool ValidateScanCode(uint8_t scancode, uint8_t character);
-    void Send(const char* data, size_t size);
-    void Print(const char* data);
-    void Print(int64_t data);
     void Keycode(uint8_t scancode);
     void ClearScreen();
-    char* itoa(int val, int base);
+    void Itoa(uint32_t x, uint32_t base);
 
     template <typename T>auto operator<<(T data) -> Terminal &
     {
@@ -59,5 +50,21 @@ namespace Regalia
     uint8_t terminal_column;
     uint8_t terminal_color;
     uint16_t* terminal_buffer;
+
+    void Print(int64_t data);
+    void Print(const char* data);
+    void Position(char character);
+    void Send(const char* data, size_t size);
+    bool ValidateScanCode(uint8_t scancode, uint8_t character);
+    void Display(char character, uint8_t color, uint8_t x, uint8_t y);
+
+    void Tab(uint8_t scancode);
+    void Enter(uint8_t scancode);
+    void Backspace(uint8_t scancode);
+
+    void ReverseConverted();
+    char ConvertToCharacter(uint32_t x);
+    void SetArray(uint32_t x, uint32_t base);
+    char converted[8];
   };
 }

@@ -12,7 +12,6 @@
 
 #define ever ;;
 
-
 void kernel_main(multiboot_info_t* mbd)
 {
   terminal << "Regalia\n\nLoading Operating System...\n\n\n";

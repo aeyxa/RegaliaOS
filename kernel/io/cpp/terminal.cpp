@@ -34,7 +34,7 @@ Regalia::Terminal::Terminal()
   */
   terminal_row = 0;
   terminal_column = 0;
-  terminal_color = VGAColor(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+  terminal_color = this->VGAColor(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
   terminal_buffer = (uint16_t*) 0xB8000;
 
   for(size_t y = 0; y < VGA_HEIGHT; y++)
@@ -42,17 +42,12 @@ Regalia::Terminal::Terminal()
     for(size_t x = 0; x < VGA_WIDTH; x++)
     {
       const size_t index = y * VGA_WIDTH + x;
-      terminal_buffer[index] = VGACharacter(' ', terminal_color);
+      terminal_buffer[index] = this->VGACharacter(' ', terminal_color);
     }
   }
 }
 
-Regalia::Terminal::~Terminal()
-{
-  /**
-  * Decontructor, not current used.
-  */
-};
+Regalia::Terminal::~Terminal(){}
 
 inline uint8_t Regalia::Terminal::VGAColor
 (enum vga_colors fg, enum vga_colors bg)
@@ -106,7 +101,7 @@ void Regalia::Terminal::Display
   * @index is the current position of where a character will be printed.
   */
   const size_t index = y * VGA_WIDTH + x;
-  terminal_buffer[index] = VGACharacter(character, color);
+  terminal_buffer[index] = this->VGACharacter(character, color);
 }
 
 bool Regalia::Terminal::ValidateScanCode(uint8_t validate, uint8_t scancode)
@@ -130,7 +125,7 @@ void Regalia::Terminal::Enter(uint8_t scancode)
   /**
   * Add one to the row, reset cursor to position 0 on new line.
   */
-  if(ValidateScanCode(0x1C,scancode))
+  if(this->ValidateScanCode(0x1C,scancode))
   {
     if(terminal_column > 0)
     {
@@ -147,7 +142,7 @@ void Regalia::Terminal::ClearScreen()
 
   for(uint8_t i=0; i < VGA_WIDTH*VGA_HEIGHT+1; i++)
   {
-    Backspace(0x0E);
+    this->Backspace(0x0E);
   }
 }
 
@@ -162,12 +157,12 @@ void Regalia::Terminal::Backspace(uint8_t scancode)
     {
       --terminal_row;
       terminal_column = 80;
-      Display(' ', terminal_color, terminal_column, terminal_row);
+      this->Display(' ', terminal_color, terminal_column, terminal_row);
     }
     if(terminal_column != 0)
     {
       --terminal_column;
-      Display(' ', terminal_color, terminal_column, terminal_row);
+      this->Display(' ', terminal_color, terminal_column, terminal_row);
     }
   }
 }
@@ -179,7 +174,7 @@ void Regalia::Terminal::Position(char character)
   * the column is equal to the maximum, we add a new row, if the row is also at
   * it's maximum, then we reset that back to 0.
   */
-  Display(character, terminal_color, terminal_column, terminal_row);
+  this->Display(character, terminal_color, terminal_column, terminal_row);
 
   if(++terminal_column == VGA_WIDTH)
   {
@@ -207,7 +202,7 @@ void Regalia::Terminal::Send(const char* data, size_t size)
     }
     else
     {
-      Position(data[i]);
+      this->Position(data[i]);
     }
   }
 }
@@ -217,7 +212,7 @@ void Regalia::Terminal::Print(const char* data)
   /**
   * Send data to be displayed on the screen.
   */
-  Send(data, StringLength(data));
+  this->Send(data, StringLength(data));
 }
 
 void Regalia::Terminal::Print(int64_t data)
@@ -226,37 +221,62 @@ void Regalia::Terminal::Print(int64_t data)
   // the binary value of the character '0' to represent the correct integer
   // provided as a char.
 
+  #define OPPOSITE_OF_DATA (data = -(data))
+
   if(data < 0)
   {
-    Position('-');
-    data = ((char)('0' + (data = -(data))));
+    this->Position('-');
+    data = ((char)('0' + OPPOSITE_OF_DATA));
   }
   else
   {
     data = ((char)('0' + data));
   }
-  Position(data);
-}
-
-char* Regalia::Terminal::itoa(int val, int base)
-{
-	static char buf[32] = {0};
-
-	int i = 30;
-
-	for(; val && i ; --i, val /= base)
-
-		buf[i] = "0123456789ABCDEF"[val % base];
-
-	return &buf[i+1];
+  this->Position(data);
 }
 
 void Regalia::Terminal::Keycode(uint8_t scancode)
 {
   switch(scancode)
   {
-    case 0x01: ClearScreen(); break;
-    case 0x0E: Backspace(scancode); break;
-    case 0x1C: Enter(scancode); break;
+    case 0x01: this->ClearScreen(); break;
+    case 0x0E: this->Backspace(scancode); break;
+    case 0x1C: this->Enter(scancode); break;
+  }
+}
+
+void Regalia::Terminal::Itoa(uint32_t x, uint32_t base)
+{
+  this->SetArray(x,base);
+}
+
+void Regalia::Terminal::SetArray(uint32_t x, uint32_t base)
+{
+  for(int i = 0; i <= 7; i++)
+  {
+    this->converted[i] = this->ConvertToCharacter(x % base);
+
+    x /= base;
+  }
+  this->ReverseConverted();
+}
+
+char Regalia::Terminal::ConvertToCharacter(uint32_t x)
+{
+  if(x < 10)
+  {
+    return x + '0';
+  }
+  else
+  {
+    return x + 'A' - 10;
+  }
+}
+
+void Regalia::Terminal::ReverseConverted()
+{
+  for(int i = 7; i >= 0; i--)
+  {
+    this->Position(this->converted[i]);
   }
 }
