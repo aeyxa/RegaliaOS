@@ -6,14 +6,12 @@
 #define GB (uint32_t)(1024*1024)
 #define TB (uint32_t)(1024*1024*1024)
 #define PRINT_HEX(data) terminal.Itoa(data,16)
+#define PRINT_INT(data) terminal.Itoa(data,10)
 #define BIT_IS_SET(bit) ((mbd->flags) & (1 << (bit)))
-#define MMAP_ADDR_PLUS_LENGTH (memory_map_t*)(mbd->mmap_addr + mbd->mmap_length)
-#define MMAP_SIZE (mmap->size + sizeof(mmap->size))
+#define MMAP_SIZE (memory_map_t*)(mbd->mmap_addr + mbd->mmap_length)
+#define SIZE_OF_MMAP (mmap->size + sizeof(mmap->size))
 #define MMAP_INCREMENT_BY(size) mmap = (memory_map_t*)((uint32_t)mmap + size)
-#define ROUND_UP(x) while(x)
-#define WHILE_NOT_DIVISIBLE_BY(x) (((memory_combined++)/x % x) != 0)
-
-#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
+#define NOT_DIVISIBLE(x) ((x++ / 256) == 0) || (((x++ / 256) % 256) != 0)
 
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
@@ -24,66 +22,48 @@ Regalia::MemoryMap::~MemoryMap(){}
 
 void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
 {
-
   if(BIT_IS_SET(0))
   {
     uint32_t memory_combined = mbd->mem_upper + mbd->mem_lower;
 
-    terminal << "\nDetected memory: ";
+    terminal << "\nDetected memory: 0x";
+    PRINT_INT(memory_combined);
+    terminal << "KB ~ 0x";
+
+    while(NOT_DIVISIBLE(memory_combined));
 
     if(memory_combined >= GB)
     {
-      ROUND_UP(WHILE_NOT_DIVISIBLE_BY(1024));
+      PRINT_INT(memory_combined / GB);
+      terminal << "GB";
     }
     else
     {
-      ROUND_UP(WHILE_NOT_DIVISIBLE_BY(256));
+      PRINT_INT(memory_combined / MB);
+      terminal << "MB";
     }
-
-    if(memory_combined >= TB)
-    {
-      terminal << (memory_combined / TB) << "TB";
-    }
-    else if(memory_combined >= GB)
-    {
-      terminal << (memory_combined / GB) << "GB";
-    }
-    else
-    {
-      terminal << (memory_combined / MB) << "MB";
-    }
-  }
-  else
-  {
-    terminal << "Error! Invalid information passed from GRUB/BIOS!\n";
   }
 
   if(BIT_IS_SET(1))
   {
-    //PRINT_HEX(mbd->boot_device);
+    //terminal << "\nBoot Device: 0x"; PRINT_HEX(mbd->boot_device);
   }
-  else
-  {
-    terminal << "Error! Invalid information passed from GRUB/BIOS!\n";
-  }
-  
+
   if(BIT_IS_SET(6))
   {
     memory_map_t *mmap = (memory_map_t*)mbd->mmap_addr;
 
-    terminal << "\nMemory map:";
+    terminal << "\nMemory Map -> (MM): Address 0x";
     PRINT_HEX(mbd->mmap_addr);
     terminal << " Length 0x";
     PRINT_HEX(mbd->mmap_length);
     terminal << "\n\n";
 
-    terminal << "-------------------------------------------------------------";
-    terminal << "\n Base Address      | Address Length    | Memory Type    | #";
-    terminal << "\n";
-    terminal << "-------------------------------------------------------------";
-    terminal << "\n";
+    terminal << "-------------------------------------------------------------"
+    << "\n Base Address      | Address Length    | Memory Type    | #" << "\n"
+    << "-------------------------------------------------------------" << "\n";
 
-    while(mmap < MMAP_ADDR_PLUS_LENGTH)
+    while(mmap < MMAP_SIZE)
     {
       terminal << " 0x";
       PRINT_HEX(mmap->base_upper);
@@ -103,14 +83,11 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
       }
       terminal << "\n";
 
-      MMAP_INCREMENT_BY(MMAP_SIZE);
+      MMAP_INCREMENT_BY(SIZE_OF_MMAP);
     }
 
-    terminal << "-------------------------------------------------------------";
-  }
-  else
-  {
-    terminal << "Error! Invalid information passed from GRUB/BIOS!\n";
+    terminal << "-------------------------------------------------------------"
+    << "\n";
   }
 
   if(BIT_IS_SET(7))
@@ -118,8 +95,22 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
     PRINT_HEX(mbd->drives_addr); terminal << " ";
     PRINT_HEX(mbd->drives_length);
   }
-  else
+
+  this->HandleMemory(mbd);
+}
+
+
+
+void Regalia::MemoryMap::HandleMemory(multiboot_info_t* mbd)
+{
+  memory_map_t *mmap = (memory_map_t*)mbd->mmap_addr;
+
+  while(mmap < MMAP_SIZE)
   {
-    terminal << "Error! Invalid information passed from GRUB/BIOS!\n";
+    if(mmap->base_lower > 0 && mmap->type == 1)
+    {
+      PRINT_HEX(mmap->base_lower);
+    }
+    MMAP_INCREMENT_BY(SIZE_OF_MMAP);
   }
 }

@@ -9,5 +9,6 @@ namespace Regalia
     ~MemoryMap();
   private:
     void DisplayGrubInformation(multiboot_info_t* mbd);
+    void HandleMemory(multiboot_info_t* mbd);
   };
 }
