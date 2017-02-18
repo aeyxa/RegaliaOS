@@ -140,9 +140,12 @@ void Regalia::Terminal::ClearScreen()
   terminal_column = 80;
   terminal_row = 25;
 
-  for(uint8_t i=0; i < VGA_WIDTH*VGA_HEIGHT+1; i++)
+  for(uint8_t i = 0; i <= 10; i++)
   {
-    this->Backspace(0x0E);
+    for(uint8_t i = 0; i < 200; ++i)
+    {
+      this->Backspace(0x0E);
+    }
   }
 }
 

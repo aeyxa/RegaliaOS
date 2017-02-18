@@ -133,6 +133,9 @@ all:
 build: $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(OBJS) Regalia.bin
 	grub2-mkrescue -o Regalia.iso loader
 
+os:
+	clear; make -s; make -s build;
+
 # This links the object files together
 Regalia.bin: linker.ld
 	$(CC_LINKER) linker.ld $(OBJ_LINK_LIST) $(FLAGS_LINKER) -o $@
