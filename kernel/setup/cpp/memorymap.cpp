@@ -15,8 +15,8 @@
 
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
-  //this->DisplayGrubInformation(mbd);
-
+  this->DisplayGrubInformation(mbd);
+  InitMemoryMap();
   /*
   uint32_t* p = (uint32_t*)0x10C000;
   p[0] = (uint32_t)5;
@@ -26,14 +26,18 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 
   uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
   terminal << "\n"; PRINT_HEX((uint32_t)p);
-  uint32_t *p2 = (uint32_t*)AllocateBlock(sizeof(uint32_t)*100);
-  terminal << "\n"; PRINT_HEX((uint32_t)p2);
-  uint32_t *p3 = (uint32_t*)AllocateBlock(sizeof(uint32_t));
-  terminal << "\n"; PRINT_HEX((uint32_t)p3);
-  terminal << "\n"; PRINT_HEX((uint32_t)sizeof(uint32_t));
-}
 
+}
 Regalia::MemoryMap::~MemoryMap(){}
+
+void Regalia::MemoryMap::InitMemoryMap()
+{
+  m_memory_size = m_memory_end_address - m_kernel_end_address;
+  memory_blocks = m_memory_size / 4096;
+
+  for(uint32_t i = 0; i <= memory_blocks; i++)
+    m_memory_map[i] = 1;
+}
 
 void* Regalia::MemoryMap::AllocateBlock(size_t size)
 {
@@ -127,7 +131,7 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
     //PRINT_HEX(mbd->drives_length);
   }
 
-  this->HandleMemory(mbd);
+  //this->HandleMemory(mbd);
 }
 
 
