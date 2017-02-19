@@ -15,44 +15,68 @@
 
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
-  this->DisplayGrubInformation(mbd);
+  //this->DisplayGrubInformation(mbd);
+
+  /*
+  uint32_t* p = (uint32_t*)0x10C000;
+  p[0] = (uint32_t)5;
+  uint32_t* x = (uint32_t*)0x10C000;
+  PRINT_INT((uint32_t)x[0]);
+  */
+
+  uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
+  terminal << "\n"; PRINT_HEX((uint32_t)p);
+  uint32_t *p2 = (uint32_t*)AllocateBlock(sizeof(uint32_t)*100);
+  terminal << "\n"; PRINT_HEX((uint32_t)p2);
+  uint32_t *p3 = (uint32_t*)AllocateBlock(sizeof(uint32_t));
+  terminal << "\n"; PRINT_HEX((uint32_t)p3);
+  terminal << "\n"; PRINT_HEX((uint32_t)sizeof(uint32_t));
 }
 
 Regalia::MemoryMap::~MemoryMap(){}
 
+void* Regalia::MemoryMap::AllocateBlock(size_t size)
+{
+  void* x = m_current_address;
+  m_current_address = m_current_address + size;
+  return x;
+}
+
 void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
 {
+  /*
   if(BIT_IS_SET(0))
   {
     uint32_t memory_combined = mbd->mem_upper + mbd->mem_lower;
 
     terminal << "\nDetected memory: 0x";
-    PRINT_INT(memory_combined);
-    terminal << "KB ~ 0x";
+    PRINT_HEX(memory_combined);
+    terminal << "KB ~0x";
 
     while(NOT_DIVISIBLE(memory_combined));
 
     if(memory_combined >= GB)
     {
-      PRINT_INT(memory_combined / GB);
+      PRINT_HEX(memory_combined / GB);
       terminal << "GB";
     }
     else
     {
-      PRINT_INT(memory_combined / MB);
+      PRINT_HEX(memory_combined / MB);
       terminal << "MB";
     }
   }
 
   if(BIT_IS_SET(1))
   {
-    //terminal << "\nBoot Device: 0x"; PRINT_HEX(mbd->boot_device);
+    /terminal << "\nBoot Device: 0x"; PRINT_HEX(mbd->boot_device);
   }
-
+  */
   if(BIT_IS_SET(6))
   {
     memory_map_t *mmap = (memory_map_t*)mbd->mmap_addr;
 
+    /*
     terminal << "\nMemory Map -> (MM): Address 0x";
     PRINT_HEX(mbd->mmap_addr);
     terminal << " Length 0x";
@@ -62,9 +86,11 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
     terminal << "-------------------------------------------------------------"
     << "\n Base Address      | Address Length    | Memory Type    | #" << "\n"
     << "-------------------------------------------------------------" << "\n";
+    */
 
     while(mmap < MMAP_SIZE)
     {
+      /*
       terminal << " 0x";
       PRINT_HEX(mmap->base_upper);
       PRINT_HEX(mmap->base_lower);
@@ -82,18 +108,23 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
         case 5: terminal << "  Bad          -> (5)"; break;
       }
       terminal << "\n";
+      */
+      if(mmap->type == 1 && mmap->length_lower > 0x100000)
+      {
+        m_memory_end_address = mmap->base_lower + mmap->length_lower;
+      }
 
       MMAP_INCREMENT_BY(SIZE_OF_MMAP);
     }
 
-    terminal << "-------------------------------------------------------------"
-    << "\n";
+    //terminal << "-------------------------------------------------------------"
+    //<< "\n";
   }
 
   if(BIT_IS_SET(7))
   {
-    PRINT_HEX(mbd->drives_addr); terminal << " ";
-    PRINT_HEX(mbd->drives_length);
+    //PRINT_HEX(mbd->drives_addr); terminal << " ";
+    //PRINT_HEX(mbd->drives_length);
   }
 
   this->HandleMemory(mbd);
@@ -109,7 +140,7 @@ void Regalia::MemoryMap::HandleMemory(multiboot_info_t* mbd)
   {
     if(mmap->base_lower > 0 && mmap->type == 1)
     {
-      PRINT_HEX(mmap->base_lower);
+      //PRINT_HEX(mmap->base_lower);
     }
     MMAP_INCREMENT_BY(SIZE_OF_MMAP);
   }
