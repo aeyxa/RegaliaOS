@@ -24,34 +24,39 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
   PRINT_INT((uint32_t)x[0]);
   */
 
+
   uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
-  terminal << "\n"; PRINT_HEX((uint32_t)p);
+  uint32_t *p2 = (uint32_t*)AllocateBlock(sizeof(uint32_t));
+  terminal << "\nP: "; PRINT_HEX((uint32_t)p);
+  terminal << "\nP: "; PRINT_HEX((uint32_t)p2);
   terminal << "\nA: "; PRINT_HEX((uint32_t)m_memory_available);
   terminal << "\nB: "; PRINT_HEX((uint32_t)m_memory_end_address);
   terminal << "\nC: "; PRINT_HEX((uint32_t)m_current_address);
-  if(m_memory_map[(uint32_t)m_current_address] == 0)
+  if(!m_memory_map[(uint32_t)m_current_address])
     terminal << "\nBAD";
+  else
+    terminal << "\nGOOD";
 }
 Regalia::MemoryMap::~MemoryMap(){}
 
 void Regalia::MemoryMap::InitMemoryMap()
 {
-  for(uint32_t i = 0; i <= m_memory_end_address; i++)
+  for(uint32_t i = 0; i <= m_memory_end_address/4096; i++)
   {
     if(i >= (uint32_t)m_kernel_end_address || i <= m_memory_available)
     {
-      m_memory_map[i] = 1;
+      m_memory_map[i] = true;
     }
     else
     {
-      m_memory_map[i] = 0;
+      m_memory_map[i] = false;
     }
   }
 }
 
 void* Regalia::MemoryMap::AllocateBlock(size_t size)
 {
-  if(m_memory_map[(uint32_t)m_current_address] == (uint32_t)0)
+  if(!m_memory_map[(uint32_t)m_current_address])
     return NULL;
 
   uint32_t old_current = (uint32_t)m_current_address;
@@ -62,7 +67,7 @@ void* Regalia::MemoryMap::AllocateBlock(size_t size)
   uint32_t new_current = (uint32_t)m_current_address;
 
   for(uint32_t i = old_current; i <= new_current; i++)
-    m_memory_map[i] = 0;
+    m_memory_map[i] = false;
 
   return x;
 }
@@ -115,7 +120,7 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
 
     while(mmap < MMAP_SIZE)
     {
-      /*
+
       terminal << " 0x";
       PRINT_HEX(mmap->base_upper);
       PRINT_HEX(mmap->base_lower);
@@ -133,14 +138,13 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
         case 5: terminal << "  Bad          -> (5)"; break;
       }
       terminal << "\n";
-      */
+
       if(mmap->type == 1 &&  mmap->base_lower > 0)
         m_memory_available = mmap->length_lower;
 
+      m_memory_end_address += (mmap->base_lower + mmap->length_lower);
       MMAP_INCREMENT_BY(SIZE_OF_MMAP);
     }
-
-    m_memory_end_address = mmap->base_lower + mmap->length_lower;
 
     //terminal << "-------------------------------------------------------------"
     //<< "\n";
