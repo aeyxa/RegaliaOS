@@ -16,7 +16,7 @@
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
   this->DisplayGrubInformation(mbd);
-  InitMemoryMap(mbd);
+  this->InitMemoryMap();
   /*
   uint32_t* p = (uint32_t*)0x10C000;
   p[0] = (uint32_t)5;
@@ -30,19 +30,36 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 }
 Regalia::MemoryMap::~MemoryMap(){}
 
-void Regalia::MemoryMap::InitMemoryMap(multiboot_info_t* mbd)
+void Regalia::MemoryMap::InitMemoryMap()
 {
-  m_memory_size = m_memory_end_address - m_kernel_end_address;
-  memory_blocks = m_memory_size / 4096;
-
-  for(uint32_t i = 0; i <= memory_blocks; i++)
-    m_memory_map[i] = 1;
+  for(uint32_t i = 0; i <= m_memory_end_address; i++)
+  {
+    if(i >= (uint32_t)m_kernel_end_address || i <= m_memory_available)
+    {
+      m_memory_map[i] = 1;
+    }
+    else
+    {
+      m_memory_map[i] = 0;
+    }
+  }
 }
 
 void* Regalia::MemoryMap::AllocateBlock(size_t size)
 {
+  if(m_memory_map[(uint32_t)m_current_address] == (uint32_t)0)
+    return NULL;
+
+  uint32_t old_current = (uint32_t)m_current_address;
+
   void* x = m_current_address;
   m_current_address = m_current_address + size;
+
+  uint32_t new_current = (uint32_t)m_current_address;
+
+  for(uint32_t i = old_current; i <= new_current; i++)
+    m_memory_map[i] = 0;
+
   return x;
 }
 
@@ -113,13 +130,13 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
       }
       terminal << "\n";
       */
-      if(mmap->type == 1 && mmap->length_lower > 0x100000)
-      {
-        m_memory_end_address = mmap->base_lower + mmap->length_lower;
-      }
+      if(mmap->type == 1 &&  mmap->base_lower > 0)
+        m_memory_available = mmap->length_lower;
 
       MMAP_INCREMENT_BY(SIZE_OF_MMAP);
     }
+
+    m_memory_end_address = mmap->base_lower + mmap->length_lower;
 
     //terminal << "-------------------------------------------------------------"
     //<< "\n";
