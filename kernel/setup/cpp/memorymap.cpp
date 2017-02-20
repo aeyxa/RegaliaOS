@@ -16,7 +16,7 @@
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
   this->DisplayGrubInformation(mbd);
-  InitMemoryMap();
+  InitMemoryMap(mbd);
   /*
   uint32_t* p = (uint32_t*)0x10C000;
   p[0] = (uint32_t)5;
@@ -30,7 +30,7 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 }
 Regalia::MemoryMap::~MemoryMap(){}
 
-void Regalia::MemoryMap::InitMemoryMap()
+void Regalia::MemoryMap::InitMemoryMap(multiboot_info_t* mbd)
 {
   m_memory_size = m_memory_end_address - m_kernel_end_address;
   memory_blocks = m_memory_size / 4096;

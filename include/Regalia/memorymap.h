@@ -14,7 +14,7 @@ namespace Regalia
     void DisplayGrubInformation(multiboot_info_t* mbd);
     void HandleMemory(multiboot_info_t* mbd);
     void* AllocateBlock(size_t size);
-    void InitMemoryMap();
+    void InitMemoryMap(multiboot_info_t* mbd);
     uint32_t *m_memory_map;
     uint32_t *m_kernel_end_address = &kernel_end;
     uint32_t *m_current_address = &kernel_end;
