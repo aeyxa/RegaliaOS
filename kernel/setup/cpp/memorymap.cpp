@@ -26,7 +26,11 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 
   uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
   terminal << "\n"; PRINT_HEX((uint32_t)p);
-
+  terminal << "\nA: "; PRINT_HEX((uint32_t)m_memory_available);
+  terminal << "\nB: "; PRINT_HEX((uint32_t)m_memory_end_address);
+  terminal << "\nC: "; PRINT_HEX((uint32_t)m_current_address);
+  if(m_memory_map[(uint32_t)m_current_address] == 0)
+    terminal << "\nBAD";
 }
 Regalia::MemoryMap::~MemoryMap(){}
 
