@@ -13,44 +13,55 @@
 #define MMAP_INCREMENT_BY(size) mmap = (memory_map_t*)((uint32_t)mmap + size)
 #define NOT_DIVISIBLE(x) ((x++ / 256) == 0) || (((x++ / 256) % 256) != 0)
 
+extern "C" void loadPageDirectory(uint32_t*);
+extern "C" void enablePaging();
+
 Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
 {
-  this->DisplayGrubInformation(mbd);
-  this->InitMemoryMap();
+  //this->DisplayGrubInformation(mbd);
+  //this->InitMemoryMap(mbd);
+
+  uint32_t page_directory[1024] __attribute__((aligned(4096)));
+  for(int i = 0; i < 1024; i++)
+    page_directory[i] = 0x00000002;
+  uint32_t first_page_table[1024] __attribute__((aligned(4096)));
+  page_directory[0] = ((unsigned int)first_page_table) | 3;
+
+  //loadPageDirectory((uint32_t*)page_directory);
+  //enablePaging();
+
+  terminal << "Paging\n";
+
   /*
-  uint32_t* p = (uint32_t*)0x10C000;
-  p[0] = (uint32_t)5;
-  uint32_t* x = (uint32_t*)0x10C000;
-  PRINT_INT((uint32_t)x[0]);
-  */
-
-
   uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
   uint32_t *p2 = (uint32_t*)AllocateBlock(sizeof(uint32_t));
   terminal << "\nP: "; PRINT_HEX((uint32_t)p);
   terminal << "\nP: "; PRINT_HEX((uint32_t)p2);
   terminal << "\nA: "; PRINT_HEX((uint32_t)m_memory_available);
-  terminal << "\nB: "; PRINT_HEX((uint32_t)m_memory_end_address);
   terminal << "\nC: "; PRINT_HEX((uint32_t)m_current_address);
   if(!m_memory_map[(uint32_t)m_current_address])
     terminal << "\nBAD";
   else
-    terminal << "\nGOOD";
+    terminal << "\nGOOD";*/
 }
 Regalia::MemoryMap::~MemoryMap(){}
 
-void Regalia::MemoryMap::InitMemoryMap()
+void Regalia::MemoryMap::InitMemoryMap(multiboot_info_t* mbd)
 {
-  for(uint32_t i = 0; i <= m_memory_end_address/4096; i++)
+  memory_map_t *mmap = (memory_map_t*)mbd->mmap_addr;
+  while(mmap < MMAP_SIZE)
   {
-    if(i >= (uint32_t)m_kernel_end_address || i <= m_memory_available)
-    {
+    if(mmap->type == 1 &&  mmap->base_lower > 0)
+      m_memory_available = mmap->length_lower;
+
+    MMAP_INCREMENT_BY(SIZE_OF_MMAP);
+  }
+  for(uint32_t i = 0x100000; i <= m_memory_available/4096; i++)
+  {
+    if(i >= (uint32_t)m_kernel_end_address)
       m_memory_map[i] = true;
-    }
     else
-    {
       m_memory_map[i] = false;
-    }
   }
 }
 
@@ -66,7 +77,7 @@ void* Regalia::MemoryMap::AllocateBlock(size_t size)
 
   uint32_t new_current = (uint32_t)m_current_address;
 
-  for(uint32_t i = old_current; i <= new_current; i++)
+  for(uint32_t i = old_current; i < new_current; i++)
     m_memory_map[i] = false;
 
   return x;
@@ -74,7 +85,6 @@ void* Regalia::MemoryMap::AllocateBlock(size_t size)
 
 void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
 {
-  /*
   if(BIT_IS_SET(0))
   {
     uint32_t memory_combined = mbd->mem_upper + mbd->mem_lower;
@@ -99,16 +109,16 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
 
   if(BIT_IS_SET(1))
   {
-    /terminal << "\nBoot Device: 0x"; PRINT_HEX(mbd->boot_device);
+    terminal << "\nBoot Device: 0x"; PRINT_HEX(mbd->boot_device);
   }
-  */
+
   if(BIT_IS_SET(6))
   {
+
     memory_map_t *mmap = (memory_map_t*)mbd->mmap_addr;
 
-    /*
     terminal << "\nMemory Map -> (MM): Address 0x";
-    PRINT_HEX(mbd->mmap_addr);
+    PRINT_INT(mbd->mmap_addr);
     terminal << " Length 0x";
     PRINT_HEX(mbd->mmap_length);
     terminal << "\n\n";
@@ -116,11 +126,9 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
     terminal << "-------------------------------------------------------------"
     << "\n Base Address      | Address Length    | Memory Type    | #" << "\n"
     << "-------------------------------------------------------------" << "\n";
-    */
 
     while(mmap < MMAP_SIZE)
     {
-
       terminal << " 0x";
       PRINT_HEX(mmap->base_upper);
       PRINT_HEX(mmap->base_lower);
@@ -139,15 +147,11 @@ void Regalia::MemoryMap::DisplayGrubInformation(multiboot_info_t* mbd)
       }
       terminal << "\n";
 
-      if(mmap->type == 1 &&  mmap->base_lower > 0)
-        m_memory_available = mmap->length_lower;
-
-      m_memory_end_address += (mmap->base_lower + mmap->length_lower);
       MMAP_INCREMENT_BY(SIZE_OF_MMAP);
     }
 
-    //terminal << "-------------------------------------------------------------"
-    //<< "\n";
+    terminal << "-------------------------------------------------------------"
+    << "\n";
   }
 
   if(BIT_IS_SET(7))
