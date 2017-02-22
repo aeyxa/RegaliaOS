@@ -1,12 +1,9 @@
 section .text
-global loadPagingDirectory
+
+global loadPageDirectory
 global enablePaging
-global test
 
-test:
-ret
-
-loadPagingDirectory:
+loadPageDirectory:
 push ebp
 mov ebp, esp
 mov eax, [esp+8]
