@@ -22,17 +22,17 @@ Regalia::MemoryMap::MemoryMap(multiboot_info_t* mbd)
   //this->InitMemoryMap(mbd);
 
   uint32_t page_directory[1024] __attribute__((aligned(4096)));
-  for(int i = 0; i < 1024; i++)
+  for(uint32_t i = 0; i < 1024; i++)
     page_directory[i] = 0x00000002;
-  uint32_t first_page_table[1024] __attribute__((aligned(4096)));
-  for(int i = 0; i < 1024; i++)
-     first_page_table[i] = (i * 0x1000) | 3;
-  page_directory[0] = ((uint32_t)first_page_table) | 3;
 
+  uint32_t first_page_table[1024] __attribute__((aligned(4096)));
+  for(uint32_t i = 0; i < 1024; i++)
+    first_page_table[i] = (i * 0x1000) | 3;
+
+  page_directory[0] = ((uint32_t)first_page_table) | 3;
+  terminal << "hi";
   loadPageDirectory(page_directory);
   enablePaging();
-
-  terminal << "Paging\n";
 
   /*
   uint32_t *p = (uint32_t*)AllocateBlock(sizeof(uint32_t));
